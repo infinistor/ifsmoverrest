@@ -83,6 +83,7 @@ public class Status extends MoverRequest {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"No Job\", \"Items\":[]}";
             } else {
                 returnJson = "{\"Result\":\"success\", \"Message\":null, \"Items\":[";
+                logger.info("status list size : {}", list.size());
                 for (Map<String, String> info : list) {
                     returnJson += "{\"JobId\":" + info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID) + ",";
 

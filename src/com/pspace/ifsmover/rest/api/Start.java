@@ -94,19 +94,12 @@ public class Start extends MoverRequest {
 
             Map<String, String> info = null;
             info = DBManager.getJobInfo(jobId);
-            // for (int i = 0; i < 3; i++) {
-            //     info = DBManager.getProcessId(jsonStart.getSource().getBucket(), jsonStart.getTarget().getBucket(), String.valueOf(pid), String.valueOf(pid + PID_GAP));
-            //     if (info == null) {
-            //         Thread.sleep(2000);
-            //     } else {
-            //         break;
-            //     }
-            // }
+
             if (info == null) {
                 logger.error("Can't find pid with script pid({})", pid);
                 throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
             }
-            // logger.info("job id : {}", info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID));
+
             logger.info("job state : {}", info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             logger.info("job error desc : {}", info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
             DBManager.insertUserMatchJob(jsonStart.getUserId(), jobId);
@@ -236,7 +229,7 @@ public class Start extends MoverRequest {
         File file = new File(Config.getInstance().getPath() + "/.jobId");
         while (!file.exists()) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new IOException(e);
             }

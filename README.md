@@ -152,26 +152,26 @@ UserId에 해당하는 모든 진행 정보를 가져옵니다.
 
 ``` bash
 {
-    \"Result\":\"string\", // success, failed
-    \"Message\":null,
-    \"Items\":[
+    "Result":"string", // success, failed
+    "Message":null,
+    "Items":[
         {
-            \"JobId\":0,
-            \"Status\":\"string\",
-            \"Source\":\"string\",
-            \"Target\":\"string\",
-            \"StartTime\":\"string\",
-            \"EndTime\":\"string\",
-            \"ErrorDesc\":\"string\",
-            \"TotalCount\":0,
-            \"TotalSize\":\"string\",
-            \"MovedCount\":0,
-            \"MovedSize\":\"string\",
-            \"SkippedCount\":0,
-            \"SkippedSize\":\"string\",
-            \"FailedCount\":0,
-            \"FailedSize\":\"string\",
-            \"Progress\":\"string\"
+            "JobId":0,
+            "Status":"string",
+            "Source":"string",
+            "Target":"string",
+            "StartTime":"string",
+            "EndTime":"string",
+            "ErrorDesc":"string",
+            "TotalCount":0,
+            "TotalSize":"string",
+            "MovedCount":0,
+            "MovedSize":"string",
+            "SkippedCount":0,
+            "SkippedSize":"string",
+            "FailedCount":0,
+            "FailedSize":"string",
+            "Progress":"string"
         },
     ]
 }

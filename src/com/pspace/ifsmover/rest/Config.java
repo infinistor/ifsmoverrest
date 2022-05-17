@@ -39,7 +39,7 @@ public class Config {
 		if (path == null) {
 			path = "./etc/ifsmoverRest.conf";
 		}
-        logger.info("config path = {}", path);
+
         properties = new Properties();
         try (InputStream myis = new FileInputStream(path)) {
             properties.load(myis);
