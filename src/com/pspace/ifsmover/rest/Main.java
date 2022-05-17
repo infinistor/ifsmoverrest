@@ -11,10 +11,14 @@
 
 package com.pspace.ifsmover.rest;
 
+import java.io.File;
+
 import com.pspace.ifsmover.rest.handler.GW;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        findIfsMover();
+
         GW gw = new GW();
         try {
             gw.init();
@@ -24,6 +28,17 @@ public class Main {
 
         } catch(Exception e) {
             
+        }
+    }
+
+    private static void findIfsMover() {
+        File file = new File(Config.getInstance().getPath() + "/ifs_mover");
+        if (!file.exists()) {
+            System.out.println();
+            System.out.println("Can't find ifs_mover");
+            System.out.println("ifsmover path : " + Config.getInstance().getPath());
+            System.out.println("Check ./etc/ifsmoverRest.conf - ifsmover_path");
+            System.exit(-1);
         }
     }
 }
