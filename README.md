@@ -42,135 +42,148 @@ UserId는 사용자가 관리합니다.
 #### Start
 ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 type, source 정보, target 정보에 대하여 검사 결과를 리턴합니다.
 
-    * URL : /api/Start
-    * Request
-    ``` bash
-    {
-        "UserId":"string",
-        "Check": false,
-        "Type":"string",// file, s3, swift
-        "Source":{
-            "mountpoint":"string",
-            "endpoint":"string",
-            "access":"string",
-            "secret":"string",
-            "bucket":"string",
-            "prefix":"string",
-            "move_size":"string"
-        },
-        "target":{
-            "endpoint":"string",
-            "access":"string",
-            "secret":"string",
-            "bucket":"string",
-            "prefix":"string"
-        }
+* URL : /api/Start
+* Request
+
+``` bash
+{
+    "UserId":"string",
+    "Check": false,
+    "Type":"string",// file, s3, swift
+    "Source":{
+        "mountpoint":"string",
+        "endpoint":"string",
+        "access":"string",
+        "secret":"string",
+        "bucket":"string",
+        "prefix":"string",
+        "move_size":"string"
+    },
+    "target":{
+        "endpoint":"string",
+        "access":"string",
+        "secret":"string",
+        "bucket":"string",
+        "prefix":"string"
     }
-    ```
-    * Return
-    ``` bash
-    {
-        "Result":"string",// success, failed
-        "Message":"string"
-    }
-    ```
+}
+```
+
+* Return
+
+``` bash
+{
+    "Result":"string",// success, failed
+    "Message":"string"
+}
+```
+
 
 #### Stop
 UserId와 jobId에 해당하는 작업을 중지 시킵니다.
 
-    * URL : /api/Stop/{UserId}/{JobId}
-    * Return
-    ``` bash
-    {
-        "Result":"string",// success, failed
-        "Message":"string"
-    }
-    ```
+* URL : /api/Stop/{UserId}/{JobId}
+* Return
+
+``` bash
+{
+    "Result":"string",// success, failed
+    "Message":"string"
+}
+```
+
 
 #### Rerun
 UserId와 jobId에 해당하는 작업을 다시 수행합니다.
 
-    * URL : /api/Rerun/{UserId}/{JobId}
-    * Request
-    ``` bash
-    {
-        "Source":{
-            "mountpoint":"string",
-            "endpoint":"string",
-            "access":"string",
-            "secret":"string",
-            "bucket":"string",
-            "prefix":"string",
-            "move_size":"string"
-        },
-        "target":{
-            "endpoint":"string",
-            "access":"string",
-            "secret":"string",
-            "bucket":"string",
-            "prefix":"string"
-        }
+* URL : /api/Rerun/{UserId}/{JobId}
+* Request
+
+``` bash
+{
+    "Source":{
+        "mountpoint":"string",
+        "endpoint":"string",
+        "access":"string",
+        "secret":"string",
+        "bucket":"string",
+        "prefix":"string",
+        "move_size":"string"
+    },
+    "target":{
+        "endpoint":"string",
+        "access":"string",
+        "secret":"string",
+        "bucket":"string",
+        "prefix":"string"
     }
-    ```
-    * Return
-    ``` bash
-    {
-        "Result":"string",// success, failed
-        "Message":"string"
-    }
-    ```
+}
+```
+
+* Return
+
+``` bash
+{
+    "Result":"string",// success, failed
+    "Message":"string"
+}
+```
+
 
 #### Remove
 UserId와 jobId에 해당하는 작업을 삭제합니다.
 
-    * URL : /api/Remove/{UserId}/{JobId}
-    * Return
-    ``` bash
-    {
-        "Result":"string",// success, failed
-        "Message":"string"
-    }
-    ```
+* URL : /api/Remove/{UserId}/{JobId}
+* Return
+
+``` bash
+{
+    "Result":"string",// success, failed
+    "Message":"string"
+}
+```
+
 
 #### Status
 UserId의 모든 작업에 진행 정보를 가져옵니다.
 
-    * URL : /api/Status/{UserId}
-    * Return
-    ``` bash
-    {
-	    \"Result\":\"string\", // success, failed
-	    \"Message\":null,
-	    \"Items\":[
-			{
-				\"JobId\":0,
-				\"Status\":\"string\",
-				\"Source\":\"string\",
-				\"Target\":\"string\",
-				\"StartTime\":\"string\",
-				\"EndTime\":\"string\",
-				\"ErrorDesc\":\"string\",
-				\"TotalCount\":0,
-				\"TotalSize\":\"string\",
-				\"MovedCount\":0,
-				\"MovedSize\":\"string\",
-				\"SkippedCount\":0,
-				\"SkippedSize\":\"string\",
-				\"FailedCount\":0,
-				\"FailedSize\":\"string\",
-				\"Progress\":\"string\"
-			},
-		]
-    }
-    // Status
-        INIT
-        MOVE
-        COMPLETE
-        STOP
-        RERUN INIT
-        RERUN MOVE
-        ERROR
-    ```
+* URL : /api/Status/{UserId}
+* Return
+
+``` bash
+{
+    \"Result\":\"string\", // success, failed
+    \"Message\":null,
+    \"Items\":[
+        {
+            \"JobId\":0,
+            \"Status\":\"string\",
+            \"Source\":\"string\",
+            \"Target\":\"string\",
+            \"StartTime\":\"string\",
+            \"EndTime\":\"string\",
+            \"ErrorDesc\":\"string\",
+            \"TotalCount\":0,
+            \"TotalSize\":\"string\",
+            \"MovedCount\":0,
+            \"MovedSize\":\"string\",
+            \"SkippedCount\":0,
+            \"SkippedSize\":\"string\",
+            \"FailedCount\":0,
+            \"FailedSize\":\"string\",
+            \"Progress\":\"string\"
+        },
+    ]
+}
+// Status
+    INIT
+    MOVE
+    COMPLETE
+    STOP
+    RERUN INIT
+    RERUN MOVE
+    ERROR
+```
 
 
 
