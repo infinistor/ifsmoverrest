@@ -145,7 +145,7 @@ UserId와 jobId에 해당하는 작업을 삭제합니다.
 
 
 #### Status
-UserId의 모든 작업에 진행 정보를 가져옵니다.
+UserId에 해당하는 모든 진행 정보를 가져옵니다.
 
 * URL : /api/Status/{UserId}
 * Return
