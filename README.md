@@ -40,7 +40,7 @@ UserId는 임의의 문자열입니다. ifsmoverRest의 모든 동작은 UserId�
 UserId는 사용자가 관리합니다.
 
 #### Start
-ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 type, source 정보, target 정보에 대하여 검사 결과를 리턴합니다.
+ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 type, source 정보, target 정보에 대한 검사 결과를 리턴합니다.
 
 * URL : /api/Start
 * Request
