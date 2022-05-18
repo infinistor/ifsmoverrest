@@ -144,9 +144,9 @@ public class Rerun extends MoverRequest {
                 fileWriter.write("bucket=" + jsonRerun.getSource().getBucket() + "\n");
             }
             if (jsonRerun.getSource().getPrefix() == null) {
-                fileWriter.write("prefix\n");
+                fileWriter.write("prefix=\n");
             } else {
-                fileWriter.write("prefix" + jsonRerun.getSource().getPrefix() + "\n");
+                fileWriter.write("prefix=" + jsonRerun.getSource().getPrefix() + "\n");
             }
             if (jsonRerun.getSource().getMoveSize() == null) {
                 fileWriter.write("move_size=\n");
@@ -184,9 +184,9 @@ public class Rerun extends MoverRequest {
                 fileWriter.write("bucket=" + jsonRerun.getTarget().getBucket() + "\n");
             }
             if (jsonRerun.getTarget().getPrefix() == null) {
-                fileWriter.write("prefix\n");
+                fileWriter.write("prefix=\n");
             } else {
-                fileWriter.write("prefix" + jsonRerun.getTarget().getPrefix() + "\n");
+                fileWriter.write("prefix=" + jsonRerun.getTarget().getPrefix() + "\n");
             }
 
             fileWriter.close();
