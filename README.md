@@ -11,7 +11,6 @@
 ### 구동 환경
 * CentOS Linux release 7.5+
 * JDK 11+
-* Python 2.0+
 
 ### 사용법
 1. [Release](https://github.com/infinistor/ifsmoverrest/releases)를 다운 받은 후에 설치를 합니다.
