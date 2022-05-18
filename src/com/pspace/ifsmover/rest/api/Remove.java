@@ -64,7 +64,7 @@ public class Remove extends MoverRequest {
             
             String returnJson = null;
             if (Strings.isNullOrEmpty(result)) {
-                returnJson = "{\"Result\":\"success\", \"Message\":\"Check success\"}";
+                returnJson = "{\"Result\":\"success\", \"Message\":\"Remove success\"}";
             } else {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"" + result + "\"}";
             }
