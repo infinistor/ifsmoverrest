@@ -80,7 +80,7 @@ ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 
 
 * test
 ``` bash
-curl -H "Content-Type:application/json" http://localhost:7123/api/Start -d "{\"UserId\":\"1234\", \"Check\":true, \"Type\":\"s3\", \"Source\":{\"mountpoint\":null, \"endpoint\":\"http://localhost:8080\", \"access\":\"******************\", \"secret\":\"******************\", \"bucket\":\"mover-test-source\", \"prefix\":null, \"move_size\":null}, \"target\":{\"endpoint\":\"http://localhost:8080\", \"access\":\"******************\", \"secret\":\"******************\", \"bucket\":\"mover-test-target-01\", \"prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" http://localhost:7123/api/Start -d "{\"UserId\":\"1234\", \"Check\":true, \"Type\":\"s3\", \"Source\":{\"mountpoint\":null, \"endpoint\":\"http://localhost:8080\", \"access\":\"your_access_key\", \"secret\":\"your_secret_key\", \"bucket\":\"mover-test-source\", \"prefix\":null, \"move_size\":null}, \"target\":{\"endpoint\":\"http://localhost:8080\", \"access\":\"your_access_key\", \"secret\":\"your_secret_key\", \"bucket\":\"mover-test-target-01\", \"prefix\":\"05-18-001\"}}"
 ```
 
 
@@ -95,6 +95,11 @@ UserId와 JobId에 해당하는 작업을 중지 시킵니다.
     "Result":"string",// success, failed
     "Message":"string"
 }
+```
+
+* test
+``` bash
+curl http://localhost:7123/api/Stop/1234/1
 ```
 
 
@@ -134,6 +139,11 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다.
 }
 ```
 
+* test
+``` bash
+curl -H "Content-Type:application/json" http://localhost:7123/api/Rerun/1234/1 -d "{\"Source\":{\"mountpoint\":null, \"endpoint\":\"http://localhost:8080\", \"access\":\"your_access_key\", \"secret\":\"your_secret_key\", \"bucket\":\"mover-test-source\", \"prefix\":null, \"move_size\":null}, \"target\":{\"endpoint\":\"http://192.168.13.13:9090\", \"access\":\"your_access_key\", \"secret\":\"your_secret_key\", \"bucket\":\"mover-test-target-01\", \"prefix\":\"05-18-001\"}}"
+```
+
 
 #### Remove
 UserId와 JobId에 해당하는 작업을 삭제합니다. 진행 중인 작업은 삭제할 수 없습니다. 먼저 Stop을 한 후에 Remove를 해야 합니다.
@@ -146,6 +156,11 @@ UserId와 JobId에 해당하는 작업을 삭제합니다. 진행 중인 작업�
     "Result":"string",// success, failed
     "Message":"string"
 }
+```
+
+* test
+``` bash
+curl http://localhost:7123/api/Remove/1234/1
 ```
 
 
@@ -190,5 +205,9 @@ UserId에 해당하는 모든 Job에 대한 진행 정보를 가져옵니다.
     ERROR
 ```
 
+* test
+``` bash
+curl http://localhost:7123/api/Status/1234
+```
 
 
