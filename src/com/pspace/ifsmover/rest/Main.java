@@ -15,19 +15,24 @@ import java.io.File;
 
 import com.pspace.ifsmover.rest.handler.GW;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) throws Exception {
         findIfsMover();
 
+        logger.info("ifsmoverRest Start ...");
         GW gw = new GW();
         try {
             gw.init();
             gw.start();
             gw.join();
-        } catch(IllegalStateException e) {
-
-        } catch(Exception e) {
-            
+        } catch (IllegalStateException e) {
+            PrintStack.logging(logger, e);
+        } catch (Exception e) {
+            PrintStack.logging(logger, e);
         }
     }
 
