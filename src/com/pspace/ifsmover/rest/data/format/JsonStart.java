@@ -26,25 +26,25 @@ public class JsonStart {
     private Source source;
 
     public static final class Source {
-        @JsonProperty("mountpoint")
+        @JsonProperty("Mountpoint")
 		private String mountPoint;
 
-        @JsonProperty("endpoint")
+        @JsonProperty("Endpoint")
         private String endPoint;
 
-        @JsonProperty("access")
+        @JsonProperty("Access")
         private String access;
 
-        @JsonProperty("secret")
+        @JsonProperty("Secret")
         private String secret;
 
-        @JsonProperty("bucket")
+        @JsonProperty("Bucket")
         private String bucket;
 
-        @JsonProperty("prefix")
+        @JsonProperty("Prefix")
         private String prefix;
 
-        @JsonProperty("move_size")
+        @JsonProperty("Move_size")
         private String moveSize;
 
         public String getMountPoint() {
@@ -104,23 +104,23 @@ public class JsonStart {
         }
     }
 
-    @JsonProperty("target")
+    @JsonProperty("Target")
     public Target target;
 
     public static final class Target {
-        @JsonProperty("endpoint")
+        @JsonProperty("Endpoint")
         private String endPoint;
 
-        @JsonProperty("access")
+        @JsonProperty("Access")
         private String access;
 
-        @JsonProperty("secret")
+        @JsonProperty("Secret")
         private String secret;
 
-        @JsonProperty("bucket")
+        @JsonProperty("Bucket")
         private String bucket;
 
-        @JsonProperty("prefix")
+        @JsonProperty("Prefix")
         private String prefix;
 
         public String getEndPoint() {
