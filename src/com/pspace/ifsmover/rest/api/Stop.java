@@ -64,7 +64,7 @@ public class Stop extends MoverRequest {
             
             String returnJson = null;
             if (Strings.isNullOrEmpty(result)) {
-                returnJson = "{\"Result\":\"success\", \"Message\":\"Check success\"}";
+                returnJson = "{\"Result\":\"success\", \"Message\":\"Stop success\"}";
             } else {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"" + result + "\"}";
             }
