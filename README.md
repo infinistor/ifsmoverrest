@@ -80,7 +80,7 @@ ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 
 
 
 #### Stop
-UserId와 jobId에 해당하는 작업을 중지 시킵니다.
+UserId와 JobId에 해당하는 작업을 중지 시킵니다.
 
 * URL : /api/Stop/{UserId}/{JobId}
 * Return
@@ -94,7 +94,7 @@ UserId와 jobId에 해당하는 작업을 중지 시킵니다.
 
 
 #### Rerun
-UserId와 jobId에 해당하는 작업을 다시 수행합니다.
+UserId와 JobId에 해당하는 작업을 다시 수행합니다.
 
 * URL : /api/Rerun/{UserId}/{JobId}
 * Request
@@ -131,7 +131,7 @@ UserId와 jobId에 해당하는 작업을 다시 수행합니다.
 
 
 #### Remove
-UserId와 jobId에 해당하는 작업을 삭제합니다. 진행 중인 작업은 삭제할 수 없습니다. 먼저 Stop을 한 후에 Remove를 해야 합니다.
+UserId와 JobId에 해당하는 작업을 삭제합니다. 진행 중인 작업은 삭제할 수 없습니다. 먼저 Stop을 한 후에 Remove를 해야 합니다.
 
 * URL : /api/Remove/{UserId}/{JobId}
 * Return
@@ -145,7 +145,7 @@ UserId와 jobId에 해당하는 작업을 삭제합니다. 진행 중인 작업�
 
 
 #### Status
-UserId에 해당하는 모든 진행 정보를 가져옵니다.
+UserId에 해당하는 모든 Job에 대한 진행 정보를 가져옵니다.
 
 * URL : /api/Status/{UserId}
 * Return
