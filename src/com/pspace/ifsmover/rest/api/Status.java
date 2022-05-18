@@ -35,6 +35,7 @@ public class Status extends MoverRequest {
 	private static final int STATE_MOVE = 1;
 	private static final int STATE_COMPLETE = 4;
 	private static final int STATE_STOP = 5;
+    private static final int STATE_REMOVE = 6;
 	private static final int STATE_RERUN = 7;
 	private static final int STATE_RERUN_MOVE = 8;
 	private static final int STATE_ERROR = 10;
@@ -77,16 +78,17 @@ public class Status extends MoverRequest {
 		double unitSkip = 0.0;
 		double percent = 0.0;
 
+        int jobCount = 0;
         try {
             List<Map<String, String>> list = DBManager.status(userId);
             if (list == null || list.size() == 0) {
-                returnJson = "{\"Result\":\"failed\", \"Message\":\"No Job\", \"Items\":[]}";
+                logger.info("No Jobs were created.");
+                returnJson = "{\"Result\":\"failed\", \"Message\":\"No Jobs were created.\", \"Items\":[]}";
             } else {
                 returnJson = "{\"Result\":\"success\", \"Message\":null, \"Items\":[";
                 logger.info("status list size : {}", list.size());
                 for (Map<String, String> info : list) {
-                    returnJson += "{\"JobId\":" + info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID) + ",";
-
+                    
                     jobId = info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID);
                     jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
                     jobType = info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE);
@@ -103,6 +105,15 @@ public class Status extends MoverRequest {
                     startTime = info.get(DBManager.JOB_TABLE_COLUMN_START);
                     endTime = info.get(DBManager.JOB_TABLE_COLUMN_END);
                     errorDesc = info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC);
+
+                    if (jobState == STATE_REMOVE) {
+                        logger.info("JobId : {} -- removed job.");
+                        continue;
+                    }
+
+                    jobCount++;
+
+                    returnJson += "{\"JobId\":" + info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID) + ",";
 
                     switch (jobState) {
                     case STATE_INIT:
@@ -270,7 +281,7 @@ public class Status extends MoverRequest {
                                     if (unitMove > 1.0) {
                                         strMoveSize = String.format("%,.2fK", unitMove);
                                     } else {
-                                        strMoveSize = String.format("%,.2fK", movedObjectsSize);
+                                        strMoveSize = String.format("%,d", movedObjectsSize);
                                     }
                                 }
                             } else {
@@ -348,6 +359,11 @@ public class Status extends MoverRequest {
                     logger.info("error desc = {}", errorDesc);
                 }
                 returnJson += "]}";
+
+                if (jobCount == 0) {
+                    logger.info("No Jobs were created.");
+                    returnJson = "{\"Result\":\"failed\", \"Message\":\"No Jobs were created.\", \"Items\":[]}";
+                }
             } 
         } catch (Exception e) {
             PrintStack.logging(logger, e);
