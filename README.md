@@ -36,8 +36,9 @@ tailf log/ifsmoverRest.log
 ```
 
 ### API
-UserId는 임의의 문자열입니다. ifsmoverRest의 모든 동작은 UserId로 구분됩니다.
-UserId는 사용자가 관리합니다.
+* UserId는 임의의 문자열입니다. 
+* ifsmoverRest의 모든 동작은 UserId로 구분됩니다.
+* UserId는 사용자가 관리합니다.
 
 #### Start
 ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 type, source 정보, target 정보에 대한 검사 결과를 리턴합니다.
@@ -131,7 +132,7 @@ UserId와 jobId에 해당하는 작업을 다시 수행합니다.
 
 
 #### Remove
-UserId와 jobId에 해당하는 작업을 삭제합니다.
+UserId와 jobId에 해당하는 작업을 삭제합니다. 진행 중인 작업은 삭제할 수 없습니다. 먼저 Stop을 한 후에 Remove를 해야 합니다.
 
 * URL : /api/Remove/{UserId}/{JobId}
 * Return
