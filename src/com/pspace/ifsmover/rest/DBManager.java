@@ -67,10 +67,16 @@ public class DBManager {
     private static final String SQL_GET_USERMATCHJOB = "SELECT match_id FROM UserMatchJob WHERE user_id='";
     private static final String SQL_GET_USERMATCHJOB_JOBID = "' and job_id='";
     
-    private static final String SQL_DELETE_USERMATCHJOB = "DELETE FROM UserMatch WHERE match_id = ";
-    public static final String STATE_RERUN_INIT = "7";
-    public static final String STATE_RERUN_MOVE = "8";
-    public static final String STATE_ERROR = "10";
+    private static final String SQL_DELETE_USERMATCHJOB = "DELETE FROM UserMatchJob WHERE match_id = ";
+
+	public static final int JOB_STATE_INIT = 0;
+	public static final int JOB_STATE_MOVE = 1;
+	public static final int JOB_STATE_COMPLETE = 4;
+	public static final int JOB_STATE_STOP = 5;
+    public static final int JOB_STATE_REMOVE = 6;
+	public static final int JOB_STATE_RERUN_INIT = 7;
+	public static final int JOB_STATE_RERUN_MOVE = 8;
+	public static final int JOB_STATE_ERROR = 10;
     
     public static void init() {
 		try {
@@ -146,32 +152,6 @@ public class DBManager {
 			logger.error(e.getMessage());
 		}
 	}
-
-    // public static Map<String, String> getProcessId(String source, String target, String scriptPid, String maxScriptPid) {
-	// 	String pid = null;
-	// 	Connection con = null;
-	// 	con = getReadConnection();
-
-	// 	String sql = SQL_GET_PID + source + "' and target_point='" + target + "' and pid > " + scriptPid + " and pid < " + maxScriptPid;
-    //     logger.debug("sql : {}", sql);
-
-    //     Map<String, String> info = null;
-	// 	try (Statement stmt = con.createStatement();
-	// 		 ResultSet rs = stmt.executeQuery(sql);) {
-	// 		if (rs.next()) {
-    //             info = new HashMap<String, String>();
-    //             info.put(JOB_TABLE_COLUMN_JOB_ID, rs.getString(1));
-    //             info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getString(2));
-    //             info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(3));
-	// 		}
-	// 	} catch (SQLException e) {
-	// 		logger.error(e.getMessage());
-	// 	}
-
-    //     close();
-
-	// 	return info;
-	// }
 
     public static Map<String, String> getJobInfo(String jobId) {
         Connection con = null;

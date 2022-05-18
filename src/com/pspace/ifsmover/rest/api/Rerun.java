@@ -59,25 +59,25 @@ public class Rerun extends MoverRequest {
 
             long matchId = DBManager.getUserMatchJob(userId, jobId);
             if (matchId == -1) {
-                String returnJson = null;
-                returnJson = "{\"Result\":\"failed\", \"Message\":\"Not exist userId and jobId\"}";
-                response.getOutputStream().write(returnJson.getBytes());
-                response.setStatus(HttpServletResponse.SC_OK);
+                setReturnJaonError("Not exist userId and jobId");
                 return;
             }
 
             command = "./ifs_mover -rerun=" + jobId + " -source=source.conf -target=target.conf";
             File file = new File(Config.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
+            process.waitFor();
 
             Map<String, String> info = null;
-            for (int i = 0; i < 3; i++) {
+            int jobState = -1;
+            while (true) {
                 info = DBManager.getJobInfo(jobId);
                 if (info == null) {
-                    Thread.sleep(2000);
+                    setReturnJaonError("Not exist userId and jobId");
+                    return;
                 } else {
-                    String jobState = info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE);
-                    if (jobState.equals(DBManager.STATE_RERUN_INIT) || jobState.equals(DBManager.STATE_RERUN_MOVE) || jobState.equals(DBManager.STATE_ERROR)) {
+                    jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
+                    if (jobState == DBManager.JOB_STATE_RERUN_INIT || jobState == DBManager.JOB_STATE_RERUN_MOVE || jobState == DBManager.JOB_STATE_ERROR) {
                         break;
                     } else {
                         Thread.sleep(2000);
@@ -85,13 +85,13 @@ public class Rerun extends MoverRequest {
                 }
             }
 
-            String returnJson = null;
-            if (info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE).equals(DBManager.STATE_ERROR)) {
-                returnJson = "{\"Result\":\"failed\", \"Message\":\"" + info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC) + "\"}";
-            } else {
-                returnJson = "{\"Result\":\"success\", \"Message\":null}";
+            if (jobState == DBManager.JOB_STATE_ERROR) {
+                setReturnJaonError(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
+                return;
             }
 
+            String returnJson = null;
+            returnJson = "{\"Result\":\"success\", \"Message\":null}";
             response.getOutputStream().write(returnJson.getBytes());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IOException | InterruptedException e) {

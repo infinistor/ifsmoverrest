@@ -99,13 +99,13 @@ public class Start extends MoverRequest {
                 logger.error("Can't find pid with script pid({})", pid);
                 throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
             }
-
+            int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             logger.info("job state : {}", info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             logger.info("job error desc : {}", info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
             DBManager.insertUserMatchJob(jsonStart.getUserId(), jobId);
             
             String returnJson = null;
-            if (info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE).equals(DBManager.STATE_ERROR)) {
+            if (jobState == DBManager.JOB_STATE_ERROR) {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"" + info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC) + "\"}";
             } else {
                 returnJson = "{\"Result\":\"success\", \"Message\":null}";

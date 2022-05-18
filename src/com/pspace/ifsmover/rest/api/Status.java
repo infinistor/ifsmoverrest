@@ -31,15 +31,6 @@ public class Status extends MoverRequest {
     private String userId = null;
     private String returnJson = null;
 
-    private static final int STATE_INIT = 0;
-	private static final int STATE_MOVE = 1;
-	private static final int STATE_COMPLETE = 4;
-	private static final int STATE_STOP = 5;
-    private static final int STATE_REMOVE = 6;
-	private static final int STATE_RERUN = 7;
-	private static final int STATE_RERUN_MOVE = 8;
-	private static final int STATE_ERROR = 10;
-
     private static final long UNIT_G = (1024 * 1024 * 1024);
 	private static final long UNIT_M = (1024 * 1024);
 	private static final long UNIT_K = 1024;
@@ -106,7 +97,7 @@ public class Status extends MoverRequest {
                     endTime = info.get(DBManager.JOB_TABLE_COLUMN_END);
                     errorDesc = info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC);
 
-                    if (jobState == STATE_REMOVE) {
+                    if (jobState == DBManager.JOB_STATE_REMOVE) {
                         logger.info("JobId : {} -- removed job.");
                         continue;
                     }
@@ -116,31 +107,31 @@ public class Status extends MoverRequest {
                     returnJson += "{\"JobId\":" + info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID) + ",";
 
                     switch (jobState) {
-                    case STATE_INIT:
+                    case DBManager.JOB_STATE_INIT:
                         returnJson += "\"Status\":\"INIT\",";
                         break;
                         
-                    case STATE_MOVE:
+                    case DBManager.JOB_STATE_MOVE:
                         returnJson += "\"Status\":\"MOVE\",";
                         break;
                         
-                    case STATE_COMPLETE:
+                    case DBManager.JOB_STATE_COMPLETE:
                         returnJson += "\"Status\":\"COMPLETE\",";
                         break;
                         
-                    case STATE_STOP:
+                    case DBManager.JOB_STATE_STOP:
                         returnJson += "\"Status\":\"STOP\",";
                         break;
                         
-                    case STATE_RERUN:
+                    case DBManager.JOB_STATE_RERUN_INIT:
                         returnJson += "\"Status\":\"RERUN INIT\",";
                         break;
                         
-                    case STATE_RERUN_MOVE:
+                    case DBManager.JOB_STATE_RERUN_MOVE:
                         returnJson += "\"Status\":\"RERUN MOVE\",";
                         break;
                         
-                    case STATE_ERROR:
+                    case DBManager.JOB_STATE_ERROR:
                         returnJson += "\"Status\":\"ERROR\",";
                         break;
                         
@@ -149,12 +140,15 @@ public class Status extends MoverRequest {
                         throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
                     }
 
-                    if (jobState == STATE_ERROR) {
+                    if (jobState == DBManager.JOB_STATE_ERROR) {
                         setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, 0, null, 0, null, 0, null, 0, null, null);
+                        logger.info("jobId = {}", jobId);
+                        logger.info("job state = {}", jobState);
+                        logger.info("error desc = {}", errorDesc);
                         continue;
                     }
 
-                    if (jobState == STATE_INIT) {
+                    if (jobState == DBManager.JOB_STATE_INIT) {
                         String strObjectSize = null;
                         unitSize = (double)objectsSize / UNIT_G;
                         
@@ -174,7 +168,7 @@ public class Status extends MoverRequest {
                             }
                         }
                         setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, 0, null, 0, null, 0, null, null);
-                    } else if (jobState == STATE_RERUN) {
+                    } else if (jobState == DBManager.JOB_STATE_RERUN_INIT) {
                         String strObjectSize = null;
                         String strSkipSize = null;
                         String strFailSize = null;
@@ -432,7 +426,7 @@ public class Status extends MoverRequest {
         if (!Strings.isNullOrEmpty(progress)) {
             returnJson += "\"Progress\":\"" + progress + "\"},";
         } else {
-            returnJson += "\"Progress\":0},";
+            returnJson += "\"Progress\":null},";
         }
     }
 }

@@ -13,6 +13,7 @@ package com.pspace.ifsmover.rest.api;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import com.google.common.base.Strings;
 import com.pspace.ifsmover.rest.Config;
@@ -54,6 +55,23 @@ public class Remove extends MoverRequest {
                 return;
             }
 
+            Map<String, String> info = null;
+            info = DBManager.getJobInfo(jobId);
+            int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
+            if (jobState == DBManager.JOB_STATE_INIT) {
+                setReturnJaonError("Job status is INIT. Stop first, and then Remove.");
+                return;
+            } else if (jobState == DBManager.JOB_STATE_MOVE) {
+                setReturnJaonError("Job status is MOVE. Stop first, and then Remove.");
+                return;
+            } else if (jobState == DBManager.JOB_STATE_RERUN_INIT) {
+                setReturnJaonError("Job status is RERUN-INIT. Stop first, and then Remove.");
+                return;
+            } else if (jobState == DBManager.JOB_STATE_RERUN_MOVE) {
+                setReturnJaonError("Job status is RERUN-MOVE. Stop first, and then Remove.");
+                return;
+            }
+
             String command = "./ifs_mover -jobremove=" + jobId;
             File file = new File(Config.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
@@ -65,6 +83,7 @@ public class Remove extends MoverRequest {
             String returnJson = null;
             if (Strings.isNullOrEmpty(result)) {
                 returnJson = "{\"Result\":\"success\", \"Message\":\"Remove success\"}";
+                DBManager.deleteUserMatchJob(matchId);
             } else {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"" + result + "\"}";
             }

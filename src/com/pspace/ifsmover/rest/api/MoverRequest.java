@@ -10,6 +10,8 @@
 */
 package com.pspace.ifsmover.rest.api;
 
+import java.io.IOException;
+
 import com.pspace.ifsmover.rest.exception.RestException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,13 @@ public abstract class MoverRequest {
     public MoverRequest(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
+    }
+
+    protected void setReturnJaonError(String errMsg) throws IOException {
+        String returnJson = null;
+        returnJson = "{\"Result\":\"failed\", \"Message\":\"" + errMsg + "\"}";
+        response.getOutputStream().write(returnJson.getBytes());
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     public abstract void process() throws RestException;
