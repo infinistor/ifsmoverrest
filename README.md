@@ -78,6 +78,11 @@ ifsmover를 실행합니다. Request의 Check에 true를 입력하면 주어진 
 }
 ```
 
+* test
+``` bash
+curl -H "Content-Type:application/json" http://localhost:7123/api/Start -d "{\"UserId\":\"1234\", \"Check\":true, \"Type\":\"s3\", \"Source\":{\"mountpoint\":null, \"endpoint\":\"http://localhost:8080\", \"access\":\"******************\", \"secret\":\"******************\", \"bucket\":\"mover-test-source\", \"prefix\":null, \"move_size\":null}, \"target\":{\"endpoint\":\"http://localhost:8080\", \"access\":\"******************\", \"secret\":\"******************\", \"bucket\":\"mover-test-target-01\", \"prefix\":\"05-18-001\"}}"
+```
+
 
 #### Stop
 UserId와 JobId에 해당하는 작업을 중지 시킵니다.
