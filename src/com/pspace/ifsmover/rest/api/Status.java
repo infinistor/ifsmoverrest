@@ -406,7 +406,7 @@ public class Status extends MoverRequest {
         if (objectCount > 0) {
             returnJson += "\"TotalCount\":" + objectCount + ", \"TotalSize\":\"" + objectSize + "\",";
         } else {
-            returnJson += "\"TotalCount\":0, \"TotalCount\":null,";
+            returnJson += "\"TotalCount\":0, \"TotalSize\":null,";
         }
         if (movedCount > 0) {
             returnJson += "\"MovedCount\":" + movedCount + ", \"MovedSize\":\"" + movedSize + "\",";
