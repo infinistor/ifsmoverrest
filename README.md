@@ -12,7 +12,7 @@
 * CentOS Linux release 7.5+
 * JDK 11+
 
-### 사용법
+### Quick Start
 1. 최신 [Release](https://github.com/infinistor/ifsmoverrest/releases)를 다운 받은 후에 설치를 합니다.
 ``` bash
 tar -xvzf ifsmoverRest-0.1.2.tar.gz
