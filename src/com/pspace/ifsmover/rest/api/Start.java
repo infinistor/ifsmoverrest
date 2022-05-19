@@ -57,36 +57,21 @@ public class Start extends MoverRequest {
             saveSourceConfFile();
             saveTargetConfFile();
 
-            if (jsonStart.isCheck()) {
-                command = "./ifs_mover -check -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
-            } else {
-                command = "./ifs_mover -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
-            }
-            logger.debug("command : {}", command);
-        } catch (IOException e) {
-            PrintStack.logging(logger, e);
-            throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
-        }
-
-        try {
+            command = "./ifs_mover -check -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
             File file = new File(Config.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
-            
-            if (jsonStart.isCheck()) {
-                process.waitFor();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			    String result = reader.readLine();
-                logger.info("result : {}", result);
-                String returnJson = null;
-                if (result.equalsIgnoreCase("Check success.")) {
-                    returnJson = "{\"Result\":\"success\", \"Message\":\"Check success\"}";
-                } else {
-                    returnJson = "{\"Result\":\"failed\", \"Message\":\"" + result + "\"}";
-                }
-                response.getOutputStream().write(returnJson.getBytes());
-                response.setStatus(HttpServletResponse.SC_OK);
+            process.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String result = reader.readLine();
+            logger.info("check result : {}", result);
+
+            if (!result.equalsIgnoreCase("Check success.")) {
+                setReturnJaonError(result);
                 return;
             }
+
+            command = "./ifs_mover -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
+            process = Runtime.getRuntime().exec(command, null, file);
             
             deleteJobIdFile();
             String jobId = getJobIdFromFile();
@@ -123,7 +108,6 @@ public class Start extends MoverRequest {
 
     public void printJsonStart() {
         logger.info("UserId : {}", jsonStart.getUserId());
-        logger.info("Check : {}", jsonStart.isCheck());
         logger.info("Type : {}", jsonStart.getType());
         logger.info("Source.mountpoint : {}", jsonStart.getSource().getMountPoint());
         logger.info("Source.endpoint : {}", jsonStart.getSource().getEndPoint());

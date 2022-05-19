@@ -16,9 +16,6 @@ public class JsonStart {
     @JsonProperty("UserId")
 	private String userId;
 
-	@JsonProperty("Check")
-	private boolean check;
-
     @JsonProperty("Type")
 	private String type;
 
@@ -172,14 +169,6 @@ public class JsonStart {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public boolean isCheck() {
-        return check;
-    }
-
-    public void setCheck(boolean check) {
-        this.check = check;
     }
 
     public String getType() {
