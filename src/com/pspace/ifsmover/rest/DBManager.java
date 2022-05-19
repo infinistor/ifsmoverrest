@@ -62,7 +62,7 @@ public class DBManager {
 	public static final String JOB_TABLE_COLUMN_END = "end";
 	public static final String JOB_TABLE_COLUMN_ERROR_DESC = "error_desc";
 
-    private static final String SQL_GET_ERRDESC = "SELECT job_state, error_desc FROM JOB WHERE job_id = ";
+    private static final String SQL_GET_JOB_INFO = "SELECT job_state, job_type, error_desc FROM JOB WHERE job_id = ";
     private static final String SQL_INSERT_USERMATCHJOB = "INSERT INTO UserMatchJob(user_id, job_id) VALUES(?, ?)";
     private static final String SQL_GET_USERMATCHJOB = "SELECT match_id FROM UserMatchJob WHERE user_id='";
     private static final String SQL_GET_USERMATCHJOB_JOBID = "' and job_id='";
@@ -157,15 +157,15 @@ public class DBManager {
         Connection con = null;
 		con = getReadConnection();
 
-        String errDesc = null;
-        String sql = SQL_GET_ERRDESC + jobId;
+        String sql = SQL_GET_JOB_INFO + jobId;
         Map<String, String> info = null;
         try (Statement stmt = con.createStatement();
 			 ResultSet rs = stmt.executeQuery(sql);) {
 			if (rs.next()) {
                 info = new HashMap<String, String>();
                 info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getString(1));
-                info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(2));
+				info.put(JOB_TABLE_COLUMN_JOB_TYPE, rs.getString(2));
+                info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(3));
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage());

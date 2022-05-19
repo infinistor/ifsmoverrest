@@ -10,9 +10,11 @@
 */
 package com.pspace.ifsmover.rest.api;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.pspace.ifsmover.rest.Config;
@@ -63,12 +65,33 @@ public class Rerun extends MoverRequest {
                 return;
             }
 
-            command = "./ifs_mover -rerun=" + jobId + " -source=source.conf -target=target.conf";
+            Map<String, String> info = null;
+            info = DBManager.getJobInfo(jobId);
+
+            if (info == null) {
+                logger.error("Can't find job({})", jobId);
+                throw new RestException(ErrCode.BAD_REQUEST);
+            }
+            String jobType = info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE);
+
+            command = "./ifs_mover -check -t=" + jobType + " -source=source.conf -target=target.conf";
             File file = new File(Config.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String result = reader.readLine();
+            logger.info("check result : {}", result);
 
-            Map<String, String> info = null;
+            if (!result.equalsIgnoreCase("Check success.")) {
+                setReturnJaonError(result);
+                return;
+            }
+            
+            command = "./ifs_mover -rerun=" + jobId + " -source=source.conf -target=target.conf";
+            process = Runtime.getRuntime().exec(command, null, file);
+            process.waitFor();
+
+            info = null;
             int jobState = -1;
             while (true) {
                 info = DBManager.getJobInfo(jobId);

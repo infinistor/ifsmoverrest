@@ -336,7 +336,20 @@ public class Status extends MoverRequest {
                     }
         
                     logger.info("jobId = {}", jobId);
-                    logger.info("job state = {}", jobState);
+                    
+                    if (jobState == DBManager.JOB_STATE_INIT) {
+                        logger.info("job state = INIT");
+                    } else if (jobState == DBManager.JOB_STATE_MOVE) {
+                        logger.info("job state = MOVE");
+                    } else if (jobState == DBManager.JOB_STATE_COMPLETE) {
+                        logger.info("job state = COMPLETE");
+                    } else if (jobState == DBManager.JOB_STATE_STOP) {
+                        logger.info("job state = STOP");
+                    } else if (jobState == DBManager.JOB_STATE_RERUN_INIT) {
+                        logger.info("job state = RERUN INIT");
+                    } else if (jobState == DBManager.JOB_STATE_RERUN_MOVE) {
+                        logger.info("job state = RERUN MOVE");
+                    }
                     logger.info("job type = {}", jobType);
                     logger.info("source = {}", sourcePoint);
                     logger.info("target = {}", targetPoint);

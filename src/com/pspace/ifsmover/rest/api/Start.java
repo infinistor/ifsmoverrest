@@ -37,7 +37,6 @@ public class Start extends MoverRequest {
     private static final int PID_GAP = 5;
     private JsonStart jsonStart = null;
     private String command = null;
-    private long pid = -1L;
 
     public Start(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
@@ -81,8 +80,8 @@ public class Start extends MoverRequest {
             info = DBManager.getJobInfo(jobId);
 
             if (info == null) {
-                logger.error("Can't find pid with script pid({})", pid);
-                throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
+                logger.error("Can't find job({})", jobId);
+                throw new RestException(ErrCode.BAD_REQUEST);
             }
             int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             logger.info("job state : {}", info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
