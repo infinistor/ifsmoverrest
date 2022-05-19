@@ -3,7 +3,7 @@
 ## 개요
 
 ### 용도
-* [ifsmover](https://github.com/infinistor/ifsmover)를 구동하기 위한 REST Server.
+* [IfsMover](https://github.com/infinistor/ifsmover)를 구동하기 위한 REST Server.
 
 ### 전제 조건
 * [IfsMover-0.2.6+](https://github.com/infinistor/ifsmover/releases) 설치되어 있어야 합니다.
