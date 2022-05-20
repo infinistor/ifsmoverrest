@@ -121,7 +121,7 @@ curl http://localhost:7123/api/Stop/1234/1
 
 
 #### Rerun
-UserId와 JobId에 해당하는 작업을 다시 수행합니다.
+UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해당하는 작업이 진행 중이면 강제로 종료하고 다시 시작합니다.
 
 * URL : /api/Rerun/{UserId}/{JobId}
 * Request
