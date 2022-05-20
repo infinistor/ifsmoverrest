@@ -86,7 +86,7 @@ public class Start extends MoverRequest {
                 return;
             }
 
-            config = new S3Config(jsonStart.getSource().getMountPoint(),
+            config = new S3Config(null,
                                   jsonStart.getTarget().getEndPoint(), 
                                   jsonStart.getTarget().getAccess(), 
                                   jsonStart.getTarget().getSecret(), 

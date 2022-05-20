@@ -94,7 +94,7 @@ public class Rerun extends MoverRequest {
                 return;
             }
 
-            config = new S3Config(jsonRerun.getSource().getMountPoint(),
+            config = new S3Config(null,
                                   jsonRerun.getTarget().getEndPoint(), 
                                   jsonRerun.getTarget().getAccess(), 
                                   jsonRerun.getTarget().getSecret(), 

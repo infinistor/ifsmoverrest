@@ -10,6 +10,8 @@
 */
 package com.pspace.ifsmover.rest.repository;
 
+import java.util.List;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.ClientConfiguration;
@@ -20,6 +22,8 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import com.pspace.ifsmover.rest.S3Config;
 
 import org.slf4j.Logger;
@@ -108,6 +112,15 @@ public class IfsS3 implements Repository {
 			return result;
 		}
 
+		if(!isValidBucketName(config.getBucket())) {
+			if (isSource) {
+				errMessage = "source - bucket name is invalid : " + config.getBucket();
+			} else {
+				errMessage = "target - bucket name is invalid : " + config.getBucket();
+			}
+			return 
+			INVALID_BUCKET;
+		}
 		result = existBucket(true, config.getBucket());
 		if (result == BUCKET_NO_EXIST) {
 			if (isSource) {
@@ -183,8 +196,48 @@ public class IfsS3 implements Repository {
 		return clientBuilder.build();
 	}
 
+	private static final CharMatcher VALID_BUCKET_CHAR =
+		CharMatcher.inRange('a', 'z')
+		.or(CharMatcher.inRange('0', '9'))
+		.or(CharMatcher.is('-'))
+		.or(CharMatcher.is('.'));
+
+	private boolean validateIpAddress(String string) {
+		List<String> parts = Splitter.on('.').splitToList(string);
+		if (parts.size() != 4) {
+			return false;
+		}
+		for (String part : parts) {
+			try {
+				int num = Integer.parseInt(part);
+				if (num < 0 || num > 255) {
+					return false;
+				}
+			} catch (NumberFormatException nfe) {
+				return false;
+			}
+		}
+		return true;
+	}
+			
+	private boolean isValidBucketName(String bucketName) {
+		if (bucketName == null ||
+				bucketName.length() < 3 || bucketName.length() > 255 ||
+				bucketName.startsWith(".") || bucketName.startsWith("-") ||
+				bucketName.endsWith(".") || bucketName.endsWith("-") || validateIpAddress(bucketName) ||
+				!VALID_BUCKET_CHAR.matchesAllOf(bucketName) ||
+				bucketName.startsWith("xn--") || bucketName.contains("..") ||
+				bucketName.contains(".-") || bucketName.contains("-.")) {
+
+			return false;
+		}
+
+		return true;
+	}
+
     private int existBucket(boolean isCheck, String bucket) {
 		int result = NO_ERROR;
+		logger.info("check exists bucket : {}", bucket);
 		try {
 			if (client.doesBucketExistV2(bucket)) {
 				result = NO_ERROR;
@@ -253,6 +306,7 @@ public class IfsS3 implements Repository {
 	}
 
 	private int createBucket(boolean isCheck) {
+		logger.info("check create bucket : {}", config.getBucket());
 		try {
 			client.createBucket(config.getBucket());
 			if (isCheck) {

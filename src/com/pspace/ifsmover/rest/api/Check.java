@@ -73,7 +73,7 @@ public class Check extends MoverRequest {
                 return;
             }
 
-            config = new S3Config(jsonCheck.getSource().getMountPoint(),
+            config = new S3Config(null,
                                   jsonCheck.getTarget().getEndPoint(), 
                                   jsonCheck.getTarget().getAccess(), 
                                   jsonCheck.getTarget().getSecret(), 

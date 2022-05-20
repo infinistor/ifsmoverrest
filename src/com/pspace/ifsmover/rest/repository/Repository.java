@@ -31,6 +31,7 @@ public interface Repository {
     public final int AMAZON_SERVICE_EXCEPTION = -2007;
     public final int BUCKET_NO_EXIST = -2008;
     public final int FAILED_CREATE_BUCKET = -2009;
+    public final int INVALID_BUCKET = -2010;
 
     public final int SWIFT_DOMAIN_VALUE_EMPTY = -3000;
     public final int SWIFT_PROJECT_VALUE_EMPTY = -3001;
