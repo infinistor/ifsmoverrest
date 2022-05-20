@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.google.common.base.Strings;
+import com.pspace.ifsmover.rest.api.Check;
 import com.pspace.ifsmover.rest.api.MoverRequest;
 import com.pspace.ifsmover.rest.api.Remove;
 import com.pspace.ifsmover.rest.api.Rerun;
@@ -77,7 +78,9 @@ public class GWHandler {
 		if (!path[1].equalsIgnoreCase("api")) {
 			throw new RestException(ErrCode.BAD_REQUEST);
 		} else {
-			if (path[2].equalsIgnoreCase("Start")) {
+			if (path[2].equalsIgnoreCase("Check")) {
+				moverRequest = new Check(request, response);
+			} else if (path[2].equalsIgnoreCase("Start")) {
 				moverRequest = new Start(request, response);
 			} else if (path[2].equalsIgnoreCase("Stop")) {
 				if (path.length == 5) {

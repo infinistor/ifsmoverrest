@@ -98,7 +98,7 @@ public class DBManager {
 	}
 
     private static String getDBURL() {
-        return DB_FILE_URL + Config.getInstance().getPath() + DB_FILE_NAME;
+        return DB_FILE_URL + RestConfig.getInstance().getPath() + DB_FILE_NAME;
     }
 	
 	private static Connection getReadConnection() {

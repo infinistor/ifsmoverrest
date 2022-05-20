@@ -17,14 +17,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.UUID;
 
-import com.pspace.ifsmover.rest.Config;
+import com.pspace.ifsmover.rest.RestConfig;
+import com.pspace.ifsmover.rest.S3Config;
+import com.google.common.base.Strings;
 import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.data.DataStart;
 import com.pspace.ifsmover.rest.data.format.JsonStart;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
+import com.pspace.ifsmover.rest.repository.IfsS3;
+import com.pspace.ifsmover.rest.repository.Repository;
+import com.pspace.ifsmover.rest.repository.RepositoryFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +40,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class Start extends MoverRequest {
     private static final Logger logger = LoggerFactory.getLogger(Start.class);
-    private static final int PID_GAP = 5;
     private JsonStart jsonStart = null;
     private String command = null;
 
@@ -51,26 +56,63 @@ public class Start extends MoverRequest {
             DataStart dataStart = new DataStart(request.getInputStream());
             dataStart.extract();
             jsonStart = dataStart.getJsonStart();
-    
-            printJsonStart();
-            saveSourceConfFile();
-            saveTargetConfFile();
 
-            command = "./ifs_mover -check -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
-            File file = new File(Config.getInstance().getPath());
-            Process process = Runtime.getRuntime().exec(command, null, file);
-            process.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String result = reader.readLine();
-            logger.info("check result : {}", result);
+            if (jsonStart.getType().equalsIgnoreCase(Repository.SWIFT)) {
+                throw new RestException(ErrCode.NOT_IMPLEMENTED);
+            }
 
-            if (!result.equalsIgnoreCase("Check success.")) {
-                setReturnJaonError(result);
+            if (Strings.isNullOrEmpty(jsonStart.getUserId())) {
+                logger.warn("UserId is null or empty");
+                setReturnJaonError("UserId is null or empty", true);
                 return;
             }
 
-            command = "./ifs_mover -t=" + jsonStart.getType() + " -source=source.conf -target=target.conf";
-            process = Runtime.getRuntime().exec(command, null, file);
+            // Check
+            S3Config config = null;
+            config = new S3Config(jsonStart.getSource().getMountPoint(),
+                                  jsonStart.getSource().getEndPoint(), 
+                                  jsonStart.getSource().getAccess(), 
+                                  jsonStart.getSource().getSecret(), 
+                                  jsonStart.getSource().getBucket(), 
+                                  jsonStart.getSource().getPrefix());
+
+            RepositoryFactory factory = new RepositoryFactory();
+            Repository sourceRepository = factory.getSourceRepository(jsonStart.getType());
+            sourceRepository.setConfig(config, true);
+            int result = sourceRepository.check();
+            if (result != 0) {
+                logger.warn(sourceRepository.getErrMessage());
+                setReturnJaonError(sourceRepository.getErrMessage(), true);
+                return;
+            }
+
+            config = new S3Config(jsonStart.getSource().getMountPoint(),
+                                  jsonStart.getTarget().getEndPoint(), 
+                                  jsonStart.getTarget().getAccess(), 
+                                  jsonStart.getTarget().getSecret(), 
+                                  jsonStart.getTarget().getBucket(), 
+                                  jsonStart.getTarget().getPrefix());
+            IfsS3 ifsS3 = new IfsS3();
+            ifsS3.setConfig(config, false);
+            result = ifsS3.check();
+            if (result != 0) {
+                logger.warn(ifsS3.getErrMessage());
+                setReturnJaonError(ifsS3.getErrMessage(), true);
+                return;
+            }
+
+            String uuid = UUID.randomUUID().toString();
+            String sourceFileName = "source." + uuid + ".conf";
+            String targetFileName = "target." + uuid + ".conf";
+
+            printJsonStart();
+            saveSourceConfFile(sourceFileName);
+            saveTargetConfFile(targetFileName);
+
+            command = "./ifs_mover -t=" + jsonStart.getType() + " -source=" + sourceFileName + " -target=" + targetFileName;
+            logger.info("command : {}", command);
+            File file = new File(RestConfig.getInstance().getPath());
+            Process process = Runtime.getRuntime().exec(command, null, file);
             
             deleteJobIdFile();
             String jobId = getJobIdFromFile();
@@ -90,16 +132,13 @@ public class Start extends MoverRequest {
             
             String returnJson = null;
             if (jobState == DBManager.JOB_STATE_ERROR) {
-                returnJson = "{\"Result\":\"failed\", \"Message\":\"" + info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC) + "\"}";
+                returnJson = "{\"Result\":\"failed\", \"Message\":\"" + info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC) + "\", \"JobId\":0}";
             } else {
-                returnJson = "{\"Result\":\"success\", \"Message\":null}";
+                returnJson = "{\"Result\":\"success\", \"Message\":null, \"JobId\":" + jobId + "}";
             }
             response.getOutputStream().write(returnJson.getBytes());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (IOException e) {
-            PrintStack.logging(logger, e);
-            throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
-        } catch (InterruptedException e) {
             PrintStack.logging(logger, e);
             throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
         }
@@ -122,9 +161,17 @@ public class Start extends MoverRequest {
         logger.info("target.prefix : {}", jsonStart.getTarget().getPrefix());
     }
     
-    public void saveSourceConfFile() throws IOException {
+    public void saveSourceConfFile(String fileName) throws IOException {
         try {
-            FileWriter fileWriter = new FileWriter(Config.getInstance().getPath() + "/source.conf", false);
+            String fullPath = null;
+            String path = RestConfig.getInstance().getPath();
+            if (path.charAt(path.length() - 1) == '/') {
+                fullPath = path + fileName;
+            } else {
+                fullPath = path + "/" + fileName;
+            }
+
+            FileWriter fileWriter = new FileWriter(fullPath, false);
             if (jsonStart.getSource().getMountPoint() == null) {
                 fileWriter.write("mountpoint=\n");
             } else {
@@ -167,9 +214,17 @@ public class Start extends MoverRequest {
         }
     }
 
-    public void saveTargetConfFile() throws IOException {
+    public void saveTargetConfFile(String fileName) throws IOException {
         try {
-            FileWriter fileWriter = new FileWriter(Config.getInstance().getPath() + "/target.conf", false);
+            String fullPath = null;
+            String path = RestConfig.getInstance().getPath();
+            if (path.charAt(path.length() - 1) == '/') {
+                fullPath = path + fileName;
+            } else {
+                fullPath = path + "/" + fileName;
+            }
+
+            FileWriter fileWriter = new FileWriter(fullPath, false);
             if (jsonStart.getTarget().getEndPoint() == null) {
                 fileWriter.write("endpoint=\n");
             } else {
@@ -203,13 +258,13 @@ public class Start extends MoverRequest {
     }
 
     private void deleteJobIdFile() {
-        File file = new File(Config.getInstance().getPath() + "/.jobId");
+        File file = new File(RestConfig.getInstance().getPath() + "/.jobId");
         if (file.exists()) {
             file.delete();
         }
     }
     private String getJobIdFromFile() throws IOException {
-        File file = new File(Config.getInstance().getPath() + "/.jobId");
+        File file = new File(RestConfig.getInstance().getPath() + "/.jobId");
         while (!file.exists()) {
             try {
                 Thread.sleep(100);

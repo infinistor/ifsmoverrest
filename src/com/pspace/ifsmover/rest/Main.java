@@ -37,11 +37,11 @@ public class Main {
     }
 
     private static void findIfsMover() {
-        File file = new File(Config.getInstance().getPath() + "/ifs_mover");
+        File file = new File(RestConfig.getInstance().getPath() + "/ifs_mover");
         if (!file.exists()) {
             System.out.println();
             System.out.println("Can't find ifs_mover");
-            System.out.println("ifsmover path : " + Config.getInstance().getPath());
+            System.out.println("ifsmover path : " + RestConfig.getInstance().getPath());
             System.out.println("Check ./etc/ifsmoverRest.conf - ifsmover_path");
             System.exit(-1);
         }

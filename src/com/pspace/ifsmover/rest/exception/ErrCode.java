@@ -18,8 +18,11 @@ public enum ErrCode {
     SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error"),
     BAD_REQUEST(HttpServletResponse.SC_BAD_REQUEST, "Bad Request"),
     INVALID_ARGUMENT(HttpServletResponse.SC_BAD_REQUEST, "Bad Request"),
-    INTERNAL_SERVER_DB_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "S3 database error has occurred"),
-    INTERNAL_SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "S3 server internal server error has occurred");
+    NOT_IMPLEMENTED(HttpServletResponse.SC_NOT_IMPLEMENTED,
+            "A header you provided implies functionality that is not" +
+            " implemented."),
+    INTERNAL_SERVER_DB_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "database error has occurred"),
+    INTERNAL_SERVER_ERROR(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "internal server error has occurred");
 
     private final String errorCode;
     private final int httpStatusCode;

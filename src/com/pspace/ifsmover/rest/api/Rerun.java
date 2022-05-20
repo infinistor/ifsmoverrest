@@ -16,14 +16,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.UUID;
 
-import com.pspace.ifsmover.rest.Config;
+import com.pspace.ifsmover.rest.RestConfig;
+import com.pspace.ifsmover.rest.S3Config;
 import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.data.DataRerun;
 import com.pspace.ifsmover.rest.data.format.JsonRerun;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
+import com.pspace.ifsmover.rest.repository.IfsS3;
+import com.pspace.ifsmover.rest.repository.Repository;
+import com.pspace.ifsmover.rest.repository.RepositoryFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +60,10 @@ public class Rerun extends MoverRequest {
             dataRerun.extract();
             jsonRerun = dataRerun.getJsonRerun();
 
-            printJsonRerun();
-            saveSourceConfFile();
-            saveTargetConfFile();
-
             long matchId = DBManager.getUserMatchJob(userId, jobId);
             if (matchId == -1) {
-                setReturnJaonError("Not exist userId and jobId");
+                logger.warn("Not exist userId and jobId");
+                setReturnJaonError("Not exist userId and jobId", false);
                 return;
             }
 
@@ -72,23 +74,52 @@ public class Rerun extends MoverRequest {
                 logger.error("Can't find job({})", jobId);
                 throw new RestException(ErrCode.BAD_REQUEST);
             }
-            String jobType = info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE);
 
-            command = "./ifs_mover -check -t=" + jobType + " -source=source.conf -target=target.conf";
-            File file = new File(Config.getInstance().getPath());
-            Process process = Runtime.getRuntime().exec(command, null, file);
-            process.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String result = reader.readLine();
-            logger.info("check result : {}", result);
+            // Check
+            S3Config config = null;
+            config = new S3Config(jsonRerun.getSource().getMountPoint(),
+                                  jsonRerun.getSource().getEndPoint(), 
+                                  jsonRerun.getSource().getAccess(), 
+                                  jsonRerun.getSource().getSecret(), 
+                                  jsonRerun.getSource().getBucket(), 
+                                  jsonRerun.getSource().getPrefix());
 
-            if (!result.equalsIgnoreCase("Check success.")) {
-                setReturnJaonError(result);
+            RepositoryFactory factory = new RepositoryFactory();
+            Repository sourceRepository = factory.getSourceRepository(info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE));
+            sourceRepository.setConfig(config, true);
+            int result = sourceRepository.check();
+            if (result != 0) {
+                logger.warn(sourceRepository.getErrMessage());
+                setReturnJaonError(sourceRepository.getErrMessage(), false);
                 return;
             }
+
+            config = new S3Config(jsonRerun.getSource().getMountPoint(),
+                                  jsonRerun.getTarget().getEndPoint(), 
+                                  jsonRerun.getTarget().getAccess(), 
+                                  jsonRerun.getTarget().getSecret(), 
+                                  jsonRerun.getTarget().getBucket(), 
+                                  jsonRerun.getTarget().getPrefix());
+            IfsS3 ifsS3 = new IfsS3();
+            ifsS3.setConfig(config, false);
+            result = ifsS3.check();
+            if (result != 0) {
+                logger.warn(ifsS3.getErrMessage());
+                setReturnJaonError(ifsS3.getErrMessage(), false);
+                return;
+            }
+
+            String uuid = UUID.randomUUID().toString();
+            String sourceFileName = "source." + uuid + ".conf";
+            String targetFileName = "target." + uuid + ".conf";
             
-            command = "./ifs_mover -rerun=" + jobId + " -source=source.conf -target=target.conf";
-            process = Runtime.getRuntime().exec(command, null, file);
+            printJsonRerun();
+            saveSourceConfFile(sourceFileName);
+            saveTargetConfFile(targetFileName);
+            
+            command = "./ifs_mover -rerun=" + jobId + " -source=" + sourceFileName + " -target=" + targetFileName;
+            File file = new File(RestConfig.getInstance().getPath());
+            Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
 
             info = null;
@@ -96,7 +127,8 @@ public class Rerun extends MoverRequest {
             while (true) {
                 info = DBManager.getJobInfo(jobId);
                 if (info == null) {
-                    setReturnJaonError("Not exist userId and jobId");
+                    logger.warn("Not exist userId and jobId");
+                    setReturnJaonError("Not exist userId and jobId", false);
                     return;
                 } else {
                     jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
@@ -109,7 +141,8 @@ public class Rerun extends MoverRequest {
             }
 
             if (jobState == DBManager.JOB_STATE_ERROR) {
-                setReturnJaonError(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
+                logger.warn(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
+                setReturnJaonError(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC), false);
                 return;
             }
 
@@ -138,9 +171,16 @@ public class Rerun extends MoverRequest {
         logger.info("target.prefix : {}", jsonRerun.getTarget().getPrefix());
     }
     
-    public void saveSourceConfFile() throws IOException {
+    public void saveSourceConfFile(String fileName) throws IOException {
         try {
-            FileWriter fileWriter = new FileWriter(Config.getInstance().getPath() + "/source.conf", false);
+            String fullPath = null;
+            String path = RestConfig.getInstance().getPath();
+            if (path.charAt(path.length() - 1) == '/') {
+                fullPath = path + fileName;
+            } else {
+                fullPath = path + "/" + fileName;
+            }
+            FileWriter fileWriter = new FileWriter(fullPath, false);
             if (jsonRerun.getSource().getMountPoint() == null) {
                 fileWriter.write("mountpoint=\n");
             } else {
@@ -183,9 +223,16 @@ public class Rerun extends MoverRequest {
         }
     }
 
-    public void saveTargetConfFile() throws IOException {
+    public void saveTargetConfFile(String fileName) throws IOException {
         try {
-            FileWriter fileWriter = new FileWriter(Config.getInstance().getPath() + "/target.conf", false);
+            String fullPath = null;
+            String path = RestConfig.getInstance().getPath();
+            if (path.charAt(path.length() - 1) == '/') {
+                fullPath = path + fileName;
+            } else {
+                fullPath = path + "/" + fileName;
+            }
+            FileWriter fileWriter = new FileWriter(fullPath, false);
             if (jsonRerun.getTarget().getEndPoint() == null) {
                 fileWriter.write("endpoint=\n");
             } else {

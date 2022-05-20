@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 
 import com.google.common.base.Strings;
-import com.pspace.ifsmover.rest.Config;
+import com.pspace.ifsmover.rest.RestConfig;
 import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.exception.ErrCode;
@@ -55,7 +55,7 @@ public class Stop extends MoverRequest {
             }
 
             String command = "./ifs_mover -jobstop=" + jobId;
-            File file = new File(Config.getInstance().getPath());
+            File file = new File(RestConfig.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

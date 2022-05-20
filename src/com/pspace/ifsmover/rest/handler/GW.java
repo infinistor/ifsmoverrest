@@ -10,7 +10,10 @@
 */
 package com.pspace.ifsmover.rest.handler;
 
-import com.pspace.ifsmover.rest.Config;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
+import com.pspace.ifsmover.rest.RestConfig;
 import com.pspace.ifsmover.rest.DBManager;
 
 import org.eclipse.jetty.http.HttpCompliance;
@@ -20,16 +23,38 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.ProxyConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GW {
-    private static final Logger logger = LoggerFactory.getLogger(GW.class);
     private Server server;
     private GWHandlerJetty handler;
+    private static final Logger logger = LoggerFactory.getLogger(GW.class);
 
     public void init() {
+        checkArgument(RestConfig.getInstance().getEndpoint() != null || RestConfig.getInstance().getSecureEndpoint() != null,
+				"Must provide endpoint or secure-endpoint");
+		
+		if (RestConfig.getInstance().getEndpoint() != null) {
+			checkArgument(RestConfig.getInstance().getEndpoint().getPath().isEmpty(),
+					"endpoint path must be empty, was: %s",	RestConfig.getInstance().getEndpoint().getPath());
+		}
+		
+		if (RestConfig.getInstance().getSecureEndpoint() != null) {
+			checkArgument(RestConfig.getInstance().getSecureEndpoint().getPath().isEmpty(),
+					"secure-endpoint path must be empty, was: %s",
+					RestConfig.getInstance().getSecureEndpoint().getPath());
+			requireNonNull(RestConfig.getInstance().getKeystorePath(), "Must provide keyStorePath with HTTPS endpoint");
+			requireNonNull(RestConfig.getInstance().getKeystorePassword(), "Must provide keyStorePassword with HTTPS endpoint");
+            logger.info("keystorePath: {}", RestConfig.getInstance().getKeystorePath());
+            logger.info("keystorePassword: {}", RestConfig.getInstance().getKeystorePassword());
+            if (RestConfig.getInstance().getKeystorePassword() == null) {
+                logger.info("null");
+            }
+		}
+
         ExecutorThreadPool pool = new ExecutorThreadPool((int)10);
         pool.setName("ifsmoverREST");
         server = new Server(pool);
@@ -44,13 +69,27 @@ public class GW {
 		httpConnectionFactory.getHttpConfiguration().setUriCompliance(customUriCompliance);
 
 		ServerConnector connector;
-        ProxyConnectionFactory httpProxyConnectionFactory = new ProxyConnectionFactory(httpConnectionFactory.getProtocol());
-        connector = new ServerConnector(server, httpProxyConnectionFactory, httpConnectionFactory);
-        connector.setHost("0.0.0.0");
-        connector.setPort(Config.getInstance().getPort());
-        connector.setIdleTimeout(Config.getInstance().getJettyMaxIdleTimeout());
-        connector.setReuseAddress(true);
-        server.addConnector(connector);
+        if (RestConfig.getInstance().getEndpoint() != null) {
+            ProxyConnectionFactory httpProxyConnectionFactory = new ProxyConnectionFactory(httpConnectionFactory.getProtocol());
+            connector = new ServerConnector(server, httpProxyConnectionFactory, httpConnectionFactory);
+            connector.setHost(RestConfig.getInstance().getEndpoint().getHost());
+            connector.setPort(RestConfig.getInstance().getEndpoint().getPort());
+            connector.setIdleTimeout(RestConfig.getInstance().getJettyMaxIdleTimeout());
+            connector.setReuseAddress(true);
+            server.addConnector(connector);
+        }
+        
+        if (RestConfig.getInstance().getSecureEndpoint() != null) {
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+            sslContextFactory.setKeyStorePath(RestConfig.getInstance().getKeystorePath());
+            sslContextFactory.setKeyStorePassword(RestConfig.getInstance().getKeystorePassword());
+            connector = new ServerConnector(server, sslContextFactory, httpConnectionFactory);
+            connector.setHost(RestConfig.getInstance().getSecureEndpoint().getHost());
+            connector.setPort(RestConfig.getInstance().getSecureEndpoint().getPort());
+            connector.setIdleTimeout(RestConfig.getInstance().getJettyMaxIdleTimeout());
+            connector.setReuseAddress(true);
+            server.addConnector(connector);
+        }
 
         handler = new GWHandlerJetty();
         server.setHandler(handler);

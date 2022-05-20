@@ -16,7 +16,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.google.common.base.Strings;
-import com.pspace.ifsmover.rest.Config;
+import com.pspace.ifsmover.rest.RestConfig;
 import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.exception.ErrCode;
@@ -59,21 +59,25 @@ public class Remove extends MoverRequest {
             info = DBManager.getJobInfo(jobId);
             int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             if (jobState == DBManager.JOB_STATE_INIT) {
-                setReturnJaonError("Job status is INIT. Stop first, and then Remove.");
+                logger.warn("Job status is INIT. Stop first, and then Remove.");
+                setReturnJaonError("Job status is INIT. Stop first, and then Remove.", false);
                 return;
             } else if (jobState == DBManager.JOB_STATE_MOVE) {
-                setReturnJaonError("Job status is MOVE. Stop first, and then Remove.");
+                logger.warn("Job status is MOVE. Stop first, and then Remove.");
+                setReturnJaonError("Job status is MOVE. Stop first, and then Remove.", false);
                 return;
             } else if (jobState == DBManager.JOB_STATE_RERUN_INIT) {
-                setReturnJaonError("Job status is RERUN-INIT. Stop first, and then Remove.");
+                logger.warn("Job status is RERUN-INIT. Stop first, and then Remove.", false);
+                setReturnJaonError("Job status is RERUN-INIT. Stop first, and then Remove.", false);
                 return;
             } else if (jobState == DBManager.JOB_STATE_RERUN_MOVE) {
-                setReturnJaonError("Job status is RERUN-MOVE. Stop first, and then Remove.");
+                logger.warn("Job status is RERUN-MOVE. Stop first, and then Remove.");
+                setReturnJaonError("Job status is RERUN-MOVE. Stop first, and then Remove.", false);
                 return;
             }
 
             String command = "./ifs_mover -jobremove=" + jobId;
-            File file = new File(Config.getInstance().getPath());
+            File file = new File(RestConfig.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

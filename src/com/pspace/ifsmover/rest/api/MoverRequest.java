@@ -28,9 +28,13 @@ public abstract class MoverRequest {
         this.response = response;
     }
 
-    protected void setReturnJaonError(String errMsg) throws IOException {
+    protected void setReturnJaonError(String errMsg, boolean isStart) throws IOException {
         String returnJson = null;
-        returnJson = "{\"Result\":\"failed\", \"Message\":\"" + errMsg + "\"}";
+        if (isStart) {
+            returnJson = "{\"Result\":\"failed\", \"Message\":\"" + errMsg + "\", \"JobId\":0}";
+        } else {
+            returnJson = "{\"Result\":\"failed\", \"Message\":\"" + errMsg + "\"}";
+        }
         response.getOutputStream().write(returnJson.getBytes());
         response.setStatus(HttpServletResponse.SC_OK);
     }
