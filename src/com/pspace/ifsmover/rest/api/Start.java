@@ -67,7 +67,7 @@ public class Start extends MoverRequest {
             }
 
             if (Strings.isNullOrEmpty(jsonStart.getUserId())) {
-                logger.warn("UserId is null or empty");
+                logger.error("UserId is null or empty");
                 setReturnJaonError("UserId is null or empty", true);
                 return;
             }
@@ -86,7 +86,6 @@ public class Start extends MoverRequest {
             sourceRepository.setConfig(config, true);
             int result = sourceRepository.check();
             if (result != 0) {
-                logger.warn(sourceRepository.getErrMessage());
                 setReturnJaonError(sourceRepository.getErrMessage(), true);
                 return;
             }
@@ -101,7 +100,6 @@ public class Start extends MoverRequest {
             ifsS3.setConfig(config, false);
             result = ifsS3.check();
             if (result != 0) {
-                logger.warn(ifsS3.getErrMessage());
                 setReturnJaonError(ifsS3.getErrMessage(), true);
                 return;
             }

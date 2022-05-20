@@ -68,7 +68,7 @@ public class Rerun extends MoverRequest {
 
             long matchId = DBManager.getUserMatchJob(userId, jobId);
             if (matchId == -1) {
-                logger.warn("Not exist userId and jobId");
+                logger.error("Not exist userId and jobId");
                 setReturnJaonError("Not exist userId and jobId", false);
                 return;
             }
@@ -95,7 +95,6 @@ public class Rerun extends MoverRequest {
             sourceRepository.setConfig(config, true);
             int result = sourceRepository.check();
             if (result != 0) {
-                logger.warn(sourceRepository.getErrMessage());
                 setReturnJaonError(sourceRepository.getErrMessage(), false);
                 return;
             }
@@ -110,7 +109,6 @@ public class Rerun extends MoverRequest {
             ifsS3.setConfig(config, false);
             result = ifsS3.check();
             if (result != 0) {
-                logger.warn(ifsS3.getErrMessage());
                 setReturnJaonError(ifsS3.getErrMessage(), false);
                 return;
             }

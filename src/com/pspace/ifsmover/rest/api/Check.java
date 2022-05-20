@@ -74,7 +74,6 @@ public class Check extends MoverRequest {
             sourceRepository.setConfig(config, true);
             int result = sourceRepository.check();
             if (result != 0) {
-                logger.warn(sourceRepository.getErrMessage());
                 setReturnJaonError(sourceRepository.getErrMessage(), false);
                 return;
             }
@@ -89,7 +88,6 @@ public class Check extends MoverRequest {
             ifsS3.setConfig(config, false);
             result = ifsS3.check();
             if (result != 0) {
-                logger.warn(ifsS3.getErrMessage());
                 setReturnJaonError(ifsS3.getErrMessage(), false);
                 return;
             }
