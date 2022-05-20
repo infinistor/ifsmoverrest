@@ -280,7 +280,6 @@ ifsmover_path=/usr/local/pspace/bin/ifsmover-0.2.6  // ifsmover가 설지된 디
 * ifsmoverRest.sh를 실행합니다. <br>
 <kbd>./ifsmoverRest.sh</kbd>
 
-* 더 자세한 실행 방법은 본 문서의 "실행 예시", "설정 파일 예시"를 참조하세요.
 
 ## How to Use (배포판의 경우)
 
