@@ -228,7 +228,6 @@ curl http://localhost:7123/api/Status/1234
 ```
 
 ### 구동 환경
-* CentOS Linux release 7.5+
 * JDK 11+
 
 
