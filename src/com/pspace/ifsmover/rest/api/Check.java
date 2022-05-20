@@ -47,7 +47,13 @@ public class Check extends MoverRequest {
         logger.info("Check ...");
         try {
             DataCheck dataCheck = new DataCheck(request.getInputStream());
-            dataCheck.extract();
+
+            try {
+                dataCheck.extract();
+            } catch (Exception e) {
+                throw new RestException(ErrCode.BAD_REQUEST);
+            }
+            
             jsonCheck = dataCheck.getJsonCheck();
     
             if (jsonCheck.getType().equalsIgnoreCase(Repository.SWIFT)) {
