@@ -54,7 +54,14 @@ public class Stop extends MoverRequest {
                 return;
             }
 
-            String command = "./ifs_mover -jobstop=" + jobId;
+            String command = null;
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.contains("win")) {
+                command = "python ifs_mover -jobstop=" + jobId;
+            } else {
+                command = "./ifs_mover -jobstop=" + jobId;
+            }
+
             File file = new File(RestConfig.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();

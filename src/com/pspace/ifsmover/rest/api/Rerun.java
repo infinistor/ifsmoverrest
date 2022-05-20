@@ -57,7 +57,13 @@ public class Rerun extends MoverRequest {
 
         try {
             DataRerun dataRerun = new DataRerun(request.getInputStream());
-            dataRerun.extract();
+
+            try {
+                dataRerun.extract();
+            } catch (Exception e) {
+                throw new RestException(ErrCode.BAD_REQUEST);
+            }
+
             jsonRerun = dataRerun.getJsonRerun();
 
             long matchId = DBManager.getUserMatchJob(userId, jobId);
@@ -110,14 +116,20 @@ public class Rerun extends MoverRequest {
             }
 
             String uuid = UUID.randomUUID().toString();
-            String sourceFileName = "source." + uuid + ".conf";
-            String targetFileName = "target." + uuid + ".conf";
+            String sourceFileName = "source-" + uuid;
+            String targetFileName = "target-" + uuid;
             
             printJsonRerun();
             saveSourceConfFile(sourceFileName);
             saveTargetConfFile(targetFileName);
             
-            command = "./ifs_mover -rerun=" + jobId + " -source=" + sourceFileName + " -target=" + targetFileName;
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.contains("win")) {
+                command = "python ifs_mover -rerun=" + jobId + " -source=" + sourceFileName + " -target=" + targetFileName;
+            } else {
+                command = "./ifs_mover -rerun=" + jobId + " -source=" + sourceFileName + " -target=" + targetFileName;
+            }
+            
             File file = new File(RestConfig.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();

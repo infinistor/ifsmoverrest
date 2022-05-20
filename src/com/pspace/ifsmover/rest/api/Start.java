@@ -54,7 +54,12 @@ public class Start extends MoverRequest {
 
         try {
             DataStart dataStart = new DataStart(request.getInputStream());
-            dataStart.extract();
+            try {
+                dataStart.extract();
+            } catch (Exception e) {
+                throw new RestException(ErrCode.BAD_REQUEST);
+            }
+            
             jsonStart = dataStart.getJsonStart();
 
             if (jsonStart.getType().equalsIgnoreCase(Repository.SWIFT)) {
@@ -66,7 +71,7 @@ public class Start extends MoverRequest {
                 setReturnJaonError("UserId is null or empty", true);
                 return;
             }
-
+        
             // Check
             S3Config config = null;
             config = new S3Config(jsonStart.getSource().getMountPoint(),
@@ -102,20 +107,26 @@ public class Start extends MoverRequest {
             }
 
             String uuid = UUID.randomUUID().toString();
-            String sourceFileName = "source." + uuid + ".conf";
-            String targetFileName = "target." + uuid + ".conf";
+            String sourceFileName = "source-" + uuid;
+            String targetFileName = "target-" + uuid;
 
             printJsonStart();
             saveSourceConfFile(sourceFileName);
             saveTargetConfFile(targetFileName);
 
-            command = "./ifs_mover -t=" + jsonStart.getType() + " -source=" + sourceFileName + " -target=" + targetFileName;
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.contains("win")) {
+                command = "python ifs_mover -t=" + jsonStart.getType() + " -source=" + sourceFileName + " -target=" + targetFileName;
+            } else {
+                command = "./ifs_mover -t=" + jsonStart.getType() + " -source=" + sourceFileName + " -target=" + targetFileName;
+            }
+            
             logger.info("command : {}", command);
             File file = new File(RestConfig.getInstance().getPath());
             Process process = Runtime.getRuntime().exec(command, null, file);
             
-            deleteJobIdFile();
-            String jobId = getJobIdFromFile();
+            // deleteJobIdFile();
+            String jobId = getJobIdFromFile(uuid);
             logger.info("JobId : {}", jobId);
 
             Map<String, String> info = null;
@@ -257,14 +268,15 @@ public class Start extends MoverRequest {
         }
     }
 
-    private void deleteJobIdFile() {
-        File file = new File(RestConfig.getInstance().getPath() + "/.jobId");
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-    private String getJobIdFromFile() throws IOException {
-        File file = new File(RestConfig.getInstance().getPath() + "/.jobId");
+    // private void deleteJobIdFile() {
+    //     File file = new File(RestConfig.getInstance().getPath() + "/.jobId");
+    //     if (file.exists()) {
+    //         file.delete();
+    //     }
+    // }
+
+    private String getJobIdFromFile(String uuid) throws IOException {
+        File file = new File(RestConfig.getInstance().getPath() + "/.jobId" + uuid);
         while (!file.exists()) {
             try {
                 Thread.sleep(100);
@@ -274,6 +286,7 @@ public class Start extends MoverRequest {
         }
         BufferedReader br = new BufferedReader(new FileReader(file));
         String jobId = br.readLine();
+        file.delete();
         return jobId;
     }
 }
