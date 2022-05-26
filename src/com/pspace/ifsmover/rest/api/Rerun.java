@@ -132,27 +132,10 @@ public class Rerun extends MoverRequest {
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
 
-            info = null;
-            int jobState = -1;
-            while (true) {
-                info = DBManager.getJobInfo(jobId);
-                if (info == null) {
-                    logger.warn("Not exist userId and jobId");
-                    setReturnJaonError("Not exist userId and jobId", false);
-                    return;
-                } else {
-                    jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
-                    if (jobState == DBManager.JOB_STATE_RERUN_INIT || jobState == DBManager.JOB_STATE_RERUN_MOVE || jobState == DBManager.JOB_STATE_ERROR) {
-                        break;
-                    } else {
-                        Thread.sleep(2000);
-                    }
-                }
-            }
-
-            if (jobState == DBManager.JOB_STATE_ERROR) {
-                logger.warn(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
-                setReturnJaonError(info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC), false);
+            info = DBManager.getJobInfo(jobId);
+            if (info == null) {
+                logger.warn("Not exist userId and jobId");
+                setReturnJaonError("Not exist userId and jobId", false);
                 return;
             }
 
