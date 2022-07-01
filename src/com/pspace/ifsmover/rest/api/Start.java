@@ -64,6 +64,11 @@ public class Start extends MoverRequest {
 
             if (jsonStart.getType().equalsIgnoreCase(Repository.SWIFT)) {
                 throw new RestException(ErrCode.NOT_IMPLEMENTED);
+            } else if (jsonStart.getType().equalsIgnoreCase(Repository.IFS_FILE)) {
+                if (Strings.isNullOrEmpty(jsonStart.getSource().getMountPoint())) {
+                    logger.error("type : file - but source config mountpoint is null or empty");
+                    throw new RestException(ErrCode.BAD_REQUEST);
+                }
             }
 
             if (Strings.isNullOrEmpty(jsonStart.getUserId())) {
