@@ -17,7 +17,8 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 import com.pspace.ifsmover.rest.RestConfig;
-import com.pspace.ifsmover.rest.DBManager;
+import com.pspace.ifsmover.rest.Utils;
+import com.pspace.ifsmover.rest.db.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
@@ -46,7 +47,7 @@ public class Remove extends MoverRequest {
         logger.info("userId : {}, jobId : {}", userId, jobId);
 
         try {
-            long matchId = DBManager.getUserMatchJob(userId, jobId);
+            long matchId = Utils.getDBInstance().getUserMatchJob(userId, jobId);
             if (matchId == -1) {
                 String returnJson = null;
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"Not exist userId and jobId\"}";
@@ -55,9 +56,9 @@ public class Remove extends MoverRequest {
                 return;
             }
 
-            Map<String, String> info = null;
-            info = DBManager.getJobInfo(jobId);
-            int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
+            Map<String, Object> info = null;
+            info = Utils.getDBInstance().getJobInfo(jobId);
+            int jobState = (int) info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE);
             if (jobState == DBManager.JOB_STATE_INIT) {
                 logger.warn("Job status is INIT. Stop first, and then Remove.");
                 setReturnJaonError("Job status is INIT. Stop first, and then Remove.", false);
@@ -94,7 +95,7 @@ public class Remove extends MoverRequest {
             String returnJson = null;
             if (Strings.isNullOrEmpty(result)) {
                 returnJson = "{\"Result\":\"success\", \"Message\":\"Remove success\"}";
-                DBManager.deleteUserMatchJob(matchId);
+                Utils.getDBInstance().deleteUserMatchJob(matchId);
             } else {
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"" + result + "\"}";
             }

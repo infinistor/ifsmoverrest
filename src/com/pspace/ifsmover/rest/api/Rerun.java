@@ -10,20 +10,19 @@
 */
 package com.pspace.ifsmover.rest.api;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.UUID;
 
 import com.pspace.ifsmover.rest.RestConfig;
 import com.pspace.ifsmover.rest.S3Config;
-import com.pspace.ifsmover.rest.DBManager;
+import com.pspace.ifsmover.rest.Utils;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.data.DataRerun;
 import com.pspace.ifsmover.rest.data.format.JsonRerun;
+import com.pspace.ifsmover.rest.db.DBManager;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
 import com.pspace.ifsmover.rest.repository.IfsS3;
@@ -66,15 +65,15 @@ public class Rerun extends MoverRequest {
 
             jsonRerun = dataRerun.getJsonRerun();
 
-            long matchId = DBManager.getUserMatchJob(userId, jobId);
+            long matchId = Utils.getDBInstance().getUserMatchJob(userId, jobId);
             if (matchId == -1) {
                 logger.error("Not exist userId and jobId");
                 setReturnJaonError("Not exist userId and jobId", false);
                 return;
             }
 
-            Map<String, String> info = null;
-            info = DBManager.getJobInfo(jobId);
+            Map<String, Object> info = null;
+            info = Utils.getDBInstance().getJobInfo(jobId);
 
             if (info == null) {
                 logger.error("Can't find job({})", jobId);
@@ -91,7 +90,7 @@ public class Rerun extends MoverRequest {
                                   jsonRerun.getSource().getPrefix());
 
             RepositoryFactory factory = new RepositoryFactory();
-            Repository sourceRepository = factory.getSourceRepository(info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE));
+            Repository sourceRepository = factory.getSourceRepository((String)info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE));
             sourceRepository.setConfig(config, true);
             int result = sourceRepository.check();
             if (result != 0) {
@@ -132,7 +131,7 @@ public class Rerun extends MoverRequest {
             Process process = Runtime.getRuntime().exec(command, null, file);
             process.waitFor();
 
-            info = DBManager.getJobInfo(jobId);
+            info = Utils.getDBInstance().getJobInfo(jobId);
             if (info == null) {
                 logger.warn("Not exist userId and jobId");
                 setReturnJaonError("Not exist userId and jobId", false);

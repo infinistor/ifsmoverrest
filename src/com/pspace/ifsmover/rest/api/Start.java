@@ -15,17 +15,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.UUID;
 
 import com.pspace.ifsmover.rest.RestConfig;
 import com.pspace.ifsmover.rest.S3Config;
+import com.pspace.ifsmover.rest.Utils;
 import com.google.common.base.Strings;
-import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.data.DataStart;
 import com.pspace.ifsmover.rest.data.format.JsonStart;
+import com.pspace.ifsmover.rest.db.DBManager;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
 import com.pspace.ifsmover.rest.repository.IfsS3;
@@ -127,17 +127,17 @@ public class Start extends MoverRequest {
             String jobId = getJobIdFromFile(uuid);
             logger.info("JobId : {}", jobId);
 
-            Map<String, String> info = null;
-            info = DBManager.getJobInfo(jobId);
+            Map<String, Object> info = null;
+            info = Utils.getDBInstance().getJobInfo(jobId);
 
             if (info == null) {
                 logger.error("Can't find job({})", jobId);
                 throw new RestException(ErrCode.BAD_REQUEST);
             }
-            int jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
+            int jobState = (int) info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE);
             logger.info("job state : {}", info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
             logger.info("job error desc : {}", info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC));
-            DBManager.insertUserMatchJob(jsonStart.getUserId(), jobId);
+            Utils.getDBInstance().insertUserMatchJob(jsonStart.getUserId(), jobId);
             
             String returnJson = null;
             if (jobState == DBManager.JOB_STATE_ERROR) {

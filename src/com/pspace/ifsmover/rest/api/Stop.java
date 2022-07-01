@@ -16,7 +16,8 @@ import java.io.InputStreamReader;
 
 import com.google.common.base.Strings;
 import com.pspace.ifsmover.rest.RestConfig;
-import com.pspace.ifsmover.rest.DBManager;
+import com.pspace.ifsmover.rest.Utils;
+import com.pspace.ifsmover.rest.db.Sqlite;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
@@ -45,7 +46,7 @@ public class Stop extends MoverRequest {
         logger.info("userId : {}, jobId : {}", userId, jobId);
 
         try {
-            long matchId = DBManager.getUserMatchJob(userId, jobId);
+            long matchId = Utils.getDBInstance().getUserMatchJob(userId, jobId);
             if (matchId == -1) {
                 String returnJson = null;
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"Not exist userId and jobId\"}";

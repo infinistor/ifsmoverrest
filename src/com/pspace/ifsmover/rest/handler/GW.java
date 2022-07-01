@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.pspace.ifsmover.rest.RestConfig;
-import com.pspace.ifsmover.rest.DBManager;
+import com.pspace.ifsmover.rest.Utils;
 
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
@@ -94,7 +94,17 @@ public class GW {
         handler = new GWHandlerJetty();
         server.setHandler(handler);
         
-        DBManager.init();
+        try {
+            Utils.getDBInstance().init(RestConfig.getInstance().getDbHost(),
+                RestConfig.getInstance().getDbPort(), 
+                RestConfig.getInstance().getDatabase(),
+                RestConfig.getInstance().getDbUser(),
+                RestConfig.getInstance().getDbPass(),
+                RestConfig.getInstance().getDbPoolSize());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            System.exit(-1);
+        }
     }
 
     public void start() throws Exception {

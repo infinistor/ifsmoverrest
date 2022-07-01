@@ -275,6 +275,13 @@ secure-endpoint=https://0.0.0.0:7333    // ifsmverRest Server가 사용할 https
 keystore-path=  // 인증서 위치
 keystore-passwords= // 인증서 암호
 ifsmover_path=/usr/local/pspace/bin/ifsmover-0.2.6  // ifsmover가 설지된 디렉토리
+db_repository=mariadb   // [sqlite, mariadb] *주의 ifsmover와 설정이 같아야 합니다.
+db_host=    // mariadb 시, host ip
+db_name=    // mariadb 시, database name
+db_port=    // mariadb 시, port
+db_user=    // mariadb 시, user name
+db_password=    // mariadb 시, user passwords
+db_pool_size=5  // mariadb 시, connection pool size
 ```
 
 * ifsmoverRest.sh를 실행합니다. <br>

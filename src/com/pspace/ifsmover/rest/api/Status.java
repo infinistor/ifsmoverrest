@@ -11,12 +11,15 @@
 package com.pspace.ifsmover.rest.api;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Strings;
-import com.pspace.ifsmover.rest.DBManager;
 import com.pspace.ifsmover.rest.PrintStack;
+import com.pspace.ifsmover.rest.Utils;
+import com.pspace.ifsmover.rest.db.DBManager;
+import com.pspace.ifsmover.rest.db.Sqlite;
 import com.pspace.ifsmover.rest.exception.ErrCode;
 import com.pspace.ifsmover.rest.exception.RestException;
 
@@ -59,6 +62,8 @@ public class Status extends MoverRequest {
 		long failedSize;
 		long skipObjectsCount;
 		long skipObjectsSize;
+        long deleteObjectCount;
+		long deleteObjectSize;
 		String startTime;
 		String endTime;
 		String errorDesc;
@@ -67,35 +72,38 @@ public class Status extends MoverRequest {
 		double unitMove = 0.0;
 		double unitFailed = 0.0;
 		double unitSkip = 0.0;
+        double unitDelete = 0.0;
 		double percent = 0.0;
 
         int jobCount = 0;
         try {
-            List<Map<String, String>> list = DBManager.status(userId);
+            List<HashMap<String, Object>> list = Utils.getDBInstance().status(userId);
             if (list == null || list.size() == 0) {
                 logger.info("No Jobs were created.");
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"No Jobs were created.\", \"Items\":[]}";
             } else {
                 returnJson = "{\"Result\":\"success\", \"Message\":null, \"Items\":[";
                 logger.info("status list size : {}", list.size());
-                for (Map<String, String> info : list) {
+                for (Map<String, Object> info : list) {
                     
-                    jobId = info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID);
-                    jobState = Integer.parseInt(info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE));
-                    jobType = info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE);
-                    sourcePoint = info.get(DBManager.JOB_TABLE_COLUMN_SOURCE_POINT);
-                    targetPoint = info.get(DBManager.JOB_TABLE_COLUMN_TARGET_POINT);
-                    objectsCount = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_OBJECTS_COUNT));
-                    objectsSize = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_OBJECTS_SIZE));
-                    movedObjectsCount = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT));
-                    movedObjectsSize = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE));
-                    failedCount = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_FAILED_COUNT));
-                    failedSize = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_FAILED_SIZE));
-                    skipObjectsCount = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT));
-                    skipObjectsSize = Long.parseLong(info.get(DBManager.JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE));
-                    startTime = info.get(DBManager.JOB_TABLE_COLUMN_START);
-                    endTime = info.get(DBManager.JOB_TABLE_COLUMN_END);
-                    errorDesc = info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC);
+                    jobId = String.valueOf((int)info.get(DBManager.JOB_TABLE_COLUMN_JOB_ID));
+                    jobState = (int) info.get(DBManager.JOB_TABLE_COLUMN_JOB_STATE);
+                    jobType = (String) info.get(DBManager.JOB_TABLE_COLUMN_JOB_TYPE);
+                    sourcePoint = (String) info.get(DBManager.JOB_TABLE_COLUMN_SOURCE_POINT);
+                    targetPoint = (String) info.get(DBManager.JOB_TABLE_COLUMN_TARGET_POINT);
+                    objectsCount = (long) info.get(DBManager.JOB_TABLE_COLUMN_OBJECTS_COUNT);
+                    objectsSize = (long) info.get(DBManager.JOB_TABLE_COLUMN_OBJECTS_SIZE);
+                    movedObjectsCount = (long) info.get(DBManager.JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT);
+                    movedObjectsSize = (long) info.get(DBManager.JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE);
+                    failedCount = (long) info.get(DBManager.JOB_TABLE_COLUMN_FAILED_COUNT);
+                    failedSize = (long) info.get(DBManager.JOB_TABLE_COLUMN_FAILED_SIZE);
+                    skipObjectsCount = (long) info.get(DBManager.JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT);
+                    skipObjectsSize = (long) info.get(DBManager.JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE);
+                    deleteObjectCount = (long) info.get(DBManager.JOB_TABLE_COLUMN_DELETE_OBJECT_COUNT);
+			        deleteObjectSize = (long) info.get(DBManager.JOB_TABLE_COLUMN_DELETE_OBJECT_SIZE);
+                    startTime = (String) info.get(DBManager.JOB_TABLE_COLUMN_START);
+                    endTime = (String) info.get(DBManager.JOB_TABLE_COLUMN_END);
+                    errorDesc = (String) info.get(DBManager.JOB_TABLE_COLUMN_ERROR_DESC);
 
                     if (jobState == DBManager.JOB_STATE_REMOVE) {
                         logger.info("JobId : {} -- removed job.");
@@ -141,7 +149,7 @@ public class Status extends MoverRequest {
                     }
 
                     if (jobState == DBManager.JOB_STATE_ERROR) {
-                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, 0, null, 0, null, 0, null, 0, null, null);
+                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, 0, null, 0, null, 0, null, 0, null, 0, null, null);
                         logger.info("jobId = {}", jobId);
                         logger.info("job state = {}", jobState);
                         logger.info("error desc = {}", errorDesc);
@@ -167,7 +175,7 @@ public class Status extends MoverRequest {
                                 }
                             }
                         }
-                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, 0, null, 0, null, 0, null, null);
+                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, 0, null, 0, null, 0, null, 0, null, null);
                     } else if (jobState == DBManager.JOB_STATE_RERUN_INIT) {
                         String strObjectSize = null;
                         String strSkipSize = null;
@@ -228,12 +236,13 @@ public class Status extends MoverRequest {
                                 }
                             }
                         }
-                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, 0, null, skipObjectsCount, strSkipSize, failedCount, strFailSize, null);
+                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, 0, null, skipObjectsCount, strSkipSize, failedCount, strFailSize, 0, null, null);
                     } else {
                         String strObjectSize = null;
                         String strMoveSize = null;
                         String strSkipSize = null;
                         String strFailSize = null;
+                        String strDeleteSize = null;
                         String strPercent = null;
                         
                         if (objectsCount == 0) {
@@ -332,7 +341,26 @@ public class Status extends MoverRequest {
                                 }
                             }
                         }
-                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, movedObjectsCount, strMoveSize, skipObjectsCount, strSkipSize, failedCount, strFailSize, strPercent);
+
+                        if (deleteObjectCount > 0) {
+                            unitDelete = (double)deleteObjectSize / UNIT_G;
+                            if (unitDelete > 1.0) {
+                                strDeleteSize = String.format("%,.2fG", unitDelete);
+                            } else {
+                                unitDelete = (double)deleteObjectSize / UNIT_M;
+                                if (unitDelete > 1.0) {
+                                    strDeleteSize = String.format("%,.2fM", unitDelete);
+                                } else {
+                                    unitDelete = (double)deleteObjectSize / UNIT_K;
+                                    if (unitDelete > 1.0) {
+                                        strDeleteSize = String.format("%,.2fK", unitDelete);
+                                    } else {
+                                        strDeleteSize = String.format("%,d", deleteObjectSize);
+                                    }
+                                }
+                            }
+                        }
+                        setRerunJson(sourcePoint, targetPoint, startTime, endTime, errorDesc, objectsCount, strObjectSize, movedObjectsCount, strMoveSize, skipObjectsCount, strSkipSize, failedCount, strFailSize, deleteObjectCount, strDeleteSize, strPercent);
                     }
         
                     logger.info("jobId = {}", jobId);
@@ -399,6 +427,8 @@ public class Status extends MoverRequest {
                               String skippedSize,
                               long failedCount,
                               String failedSize,
+                              long deleteObjectCount,
+                              String deleteSize,
                               String progress) {
         returnJson += "\"Source\":\"" + sourcePoint + "\", \"Target\":\"" + targetPoint + "\",";
         if (!Strings.isNullOrEmpty(startTime)) {
@@ -435,6 +465,11 @@ public class Status extends MoverRequest {
             returnJson += "\"FailedCount\":" + failedCount + ", \"FailedSize\":\"" + failedSize + "\",";
         } else {
             returnJson += "\"FailedCount\":0, \"FailedSize\":null,";
+        }
+        if (deleteObjectCount > 0) {
+            returnJson += "\"DeletedCount\":" + deleteObjectCount + ", \"DeletedSize\":\"" + deleteSize + "\",";
+        } else {
+            returnJson += "\"DeletedCount\":0, \"DeletedSize\":null,";
         }
         if (!Strings.isNullOrEmpty(progress)) {
             returnJson += "\"Progress\":\"" + progress + "\"},";
