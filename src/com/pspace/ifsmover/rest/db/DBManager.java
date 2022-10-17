@@ -59,4 +59,8 @@ public interface DBManager {
     public int getUserMatchJob(String userId, String jobId);
     public void deleteUserMatchJob(long matchId);
     public List<HashMap<String, Object>> status(String userId);
+	public List<HashMap<String, Object>> status(String userId, String jobId);
+	public List<HashMap<String, Object>> status(String userId, String srcBucket, String dstBucket);
+	public List<HashMap<String, Object>> statusSrcBucket(String userId, String srcBucket);
+	public List<HashMap<String, Object>> statusDstBucket(String userId, String dstBucket);
 }

@@ -18,6 +18,7 @@ import java.util.Map;
 import com.google.common.base.Strings;
 import com.pspace.ifsmover.rest.PrintStack;
 import com.pspace.ifsmover.rest.Utils;
+import com.pspace.ifsmover.rest.data.DataStatus;
 import com.pspace.ifsmover.rest.db.DBManager;
 import com.pspace.ifsmover.rest.db.Sqlite;
 import com.pspace.ifsmover.rest.exception.ErrCode;
@@ -48,7 +49,31 @@ public class Status extends MoverRequest {
         // TODO Auto-generated method stub
         logger.info("Status ...");
         logger.info("userId : {}", userId);
+        
+        DataStatus dataStatus;
+        try {
+            dataStatus = new DataStatus(request);
+            dataStatus.extract();
+        } catch (Exception e) {
+            throw new RestException(ErrCode.BAD_REQUEST);
+        }
 
+        String jobId = dataStatus.getJobId();
+        String srcBucket = dataStatus.getSrcBucket();
+        String dstBucket = dataStatus.getDstBucket();
+        logger.info("jobId : {}, srcBucket : {}, dstBucket : {}", jobId, srcBucket, dstBucket);
+        status(userId, jobId, srcBucket, dstBucket);
+
+        try {
+            response.getOutputStream().write(returnJson.getBytes());
+        } catch (IOException e) {
+            PrintStack.logging(logger, e);
+            throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private void status(String userId, String markedJobId, String srcBucket, String dstBucket) throws RestException {
         String jobId;
 		int jobState;
 		String jobType;
@@ -77,7 +102,19 @@ public class Status extends MoverRequest {
 
         int jobCount = 0;
         try {
-            List<HashMap<String, Object>> list = Utils.getDBInstance().status(userId);
+            List<HashMap<String, Object>> list;
+            if (!Strings.isNullOrEmpty(markedJobId)) {
+                list = Utils.getDBInstance().status(userId, markedJobId);
+            } else if (!Strings.isNullOrEmpty(srcBucket) && !Strings.isNullOrEmpty(dstBucket)) {
+                list = Utils.getDBInstance().status(userId, srcBucket, dstBucket);
+            } else if (!Strings.isNullOrEmpty(srcBucket)) {
+                list = Utils.getDBInstance().statusSrcBucket(userId, srcBucket);
+            } else if (!Strings.isNullOrEmpty(dstBucket)) {
+                list = Utils.getDBInstance().statusDstBucket(userId, dstBucket);
+            } else {
+                list = Utils.getDBInstance().status(userId);
+            }
+            
             if (list == null || list.size() == 0) {
                 logger.info("No Jobs were created.");
                 returnJson = "{\"Result\":\"failed\", \"Message\":\"No Jobs were created.\", \"Items\":[]}";
@@ -404,14 +441,6 @@ public class Status extends MoverRequest {
             PrintStack.logging(logger, e);
             throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
         }
-
-        try {
-            response.getOutputStream().write(returnJson.getBytes());
-        } catch (IOException e) {
-            PrintStack.logging(logger, e);
-            throw new RestException(ErrCode.INTERNAL_SERVER_ERROR);
-        }
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void setRerunJson(String sourcePoint, 

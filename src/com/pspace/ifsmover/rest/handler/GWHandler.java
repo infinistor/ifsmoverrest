@@ -50,6 +50,9 @@ public class GWHandler {
 		long startTime = System.currentTimeMillis();
 
 		String uri = request.getRequestURI();
+
+		logger.info("request url : {}", request.getRequestURL());
+		logger.info("PREURI - {}", uri);
 		logger.info("client address - {}", request.getRemoteAddr());
 		logger.info("client host - {}", request.getRemoteHost());
 		logger.info("method - {}", method);

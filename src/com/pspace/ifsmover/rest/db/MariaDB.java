@@ -240,5 +240,58 @@ public class MariaDB implements DBManager {
 
 		return null;
     }
+
+	@Override
+	public List<HashMap<String, Object>> status(String userId, String jobId) {
+		// TODO Auto-generated method stub
+		try {
+			List<Object> params = new ArrayList<Object>();
+			params.add(jobId);
+			return select(SQL_SELECT_JOB_STATUS + userId + "' and A.job_id = ?", params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> status(String userId, String srcBucket, String dstBucket) {
+		// TODO Auto-generated method stub
+		try {
+			List<Object> params = new ArrayList<Object>();
+			params.add("%" + srcBucket + "%");
+			params.add("%" + dstBucket + "%");
+			return select(SQL_SELECT_JOB_STATUS + userId + "' and A.source_point LIKE ? and A.target_point LIKE ?", params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> statusSrcBucket(String userId, String srcBucket) {
+		// TODO Auto-generated method stub
+		try {
+			List<Object> params = new ArrayList<Object>();
+			params.add("%" + srcBucket + "%");
+			return select(SQL_SELECT_JOB_STATUS + userId + "' and A.source_point LIKE ?", params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> statusDstBucket(String userId, String dstBucket) {
+		// TODO Auto-generated method stub
+		try {
+			List<Object> params = new ArrayList<Object>();
+			params.add("%" + dstBucket + "%");
+			return select(SQL_SELECT_JOB_STATUS + userId + "' and A.target_point LIKE ?", params);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
     
 }

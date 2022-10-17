@@ -260,5 +260,202 @@ public class Sqlite implements DBManager {
 		return list;
 	}
 
+	@Override
+	public List<HashMap<String, Object>> status(String userId, String jobId) {
+		Connection con = null;
+		con = getReadConnection();
+
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> info = null;
+
+		if (con == null) {
+			return list;
+		}
+
+		String sql = SQL_SELECT_JOB_STATUS + userId + "' and A.job_id = ?";
+		try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+			pstmt.setString(1, jobId);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				info = new HashMap<String, Object>();
+				
+				info.put(JOB_TABLE_COLUMN_JOB_ID, rs.getInt(1));
+				info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getInt(2));
+				info.put(JOB_TABLE_COLUMN_JOB_TYPE, rs.getString(3));
+				info.put(JOB_TABLE_COLUMN_SOURCE_POINT, rs.getString(4));
+				info.put(JOB_TABLE_COLUMN_TARGET_POINT, rs.getString(5));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_COUNT, rs.getLong(6));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_SIZE, rs.getLong(7));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT, rs.getLong(8));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE, rs.getLong(9));
+				info.put(JOB_TABLE_COLUMN_FAILED_COUNT, rs.getLong(10));
+				info.put(JOB_TABLE_COLUMN_FAILED_SIZE, rs.getLong(11));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT, rs.getLong(12));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE, rs.getLong(13));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_COUNT, rs.getLong(14));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_SIZE, rs.getLong(15));
+				info.put(JOB_TABLE_COLUMN_START, rs.getString(16));
+				info.put(JOB_TABLE_COLUMN_END, rs.getString(17));
+				info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(18));
+
+				list.add(info);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+		}
+
+        close();
+		
+		return list;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> status(String userId, String srcBucket, String dstBucket) {
+		Connection con = null;
+		con = getReadConnection();
+
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> info = null;
+
+		if (con == null) {
+			return list;
+		}
+
+		String sql = SQL_SELECT_JOB_STATUS + userId + "' and A.source_point LIKE ? and A.target_point LIKE ?";
+		try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+			pstmt.setString(1, srcBucket);
+			pstmt.setString(2, dstBucket);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				info = new HashMap<String, Object>();
+				
+				info.put(JOB_TABLE_COLUMN_JOB_ID, rs.getInt(1));
+				info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getInt(2));
+				info.put(JOB_TABLE_COLUMN_JOB_TYPE, rs.getString(3));
+				info.put(JOB_TABLE_COLUMN_SOURCE_POINT, rs.getString(4));
+				info.put(JOB_TABLE_COLUMN_TARGET_POINT, rs.getString(5));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_COUNT, rs.getLong(6));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_SIZE, rs.getLong(7));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT, rs.getLong(8));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE, rs.getLong(9));
+				info.put(JOB_TABLE_COLUMN_FAILED_COUNT, rs.getLong(10));
+				info.put(JOB_TABLE_COLUMN_FAILED_SIZE, rs.getLong(11));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT, rs.getLong(12));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE, rs.getLong(13));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_COUNT, rs.getLong(14));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_SIZE, rs.getLong(15));
+				info.put(JOB_TABLE_COLUMN_START, rs.getString(16));
+				info.put(JOB_TABLE_COLUMN_END, rs.getString(17));
+				info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(18));
+
+				list.add(info);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+		}
+
+        close();
+		
+		return list;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> statusSrcBucket(String userId, String srcBucket) {
+		Connection con = null;
+		con = getReadConnection();
+
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> info = null;
+
+		if (con == null) {
+			return list;
+		}
+
+		String sql = SQL_SELECT_JOB_STATUS + userId + "' and A.source_point LIKE ?";
+		try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+			pstmt.setString(1, srcBucket);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				info = new HashMap<String, Object>();
+				
+				info.put(JOB_TABLE_COLUMN_JOB_ID, rs.getInt(1));
+				info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getInt(2));
+				info.put(JOB_TABLE_COLUMN_JOB_TYPE, rs.getString(3));
+				info.put(JOB_TABLE_COLUMN_SOURCE_POINT, rs.getString(4));
+				info.put(JOB_TABLE_COLUMN_TARGET_POINT, rs.getString(5));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_COUNT, rs.getLong(6));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_SIZE, rs.getLong(7));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT, rs.getLong(8));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE, rs.getLong(9));
+				info.put(JOB_TABLE_COLUMN_FAILED_COUNT, rs.getLong(10));
+				info.put(JOB_TABLE_COLUMN_FAILED_SIZE, rs.getLong(11));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT, rs.getLong(12));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE, rs.getLong(13));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_COUNT, rs.getLong(14));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_SIZE, rs.getLong(15));
+				info.put(JOB_TABLE_COLUMN_START, rs.getString(16));
+				info.put(JOB_TABLE_COLUMN_END, rs.getString(17));
+				info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(18));
+
+				list.add(info);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+		}
+
+        close();
+		
+		return list;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> statusDstBucket(String userId, String dstBucket) {
+		Connection con = null;
+		con = getReadConnection();
+
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> info = null;
+
+		if (con == null) {
+			return list;
+		}
+
+		String sql = SQL_SELECT_JOB_STATUS + userId + "' and A.target_point LIKE ?";
+		try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+			pstmt.setString(1, dstBucket);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				info = new HashMap<String, Object>();
+				
+				info.put(JOB_TABLE_COLUMN_JOB_ID, rs.getInt(1));
+				info.put(JOB_TABLE_COLUMN_JOB_STATE, rs.getInt(2));
+				info.put(JOB_TABLE_COLUMN_JOB_TYPE, rs.getString(3));
+				info.put(JOB_TABLE_COLUMN_SOURCE_POINT, rs.getString(4));
+				info.put(JOB_TABLE_COLUMN_TARGET_POINT, rs.getString(5));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_COUNT, rs.getLong(6));
+				info.put(JOB_TABLE_COLUMN_OBJECTS_SIZE, rs.getLong(7));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_COUNT, rs.getLong(8));
+				info.put(JOB_TABLE_COLUMN_MOVED_OBJECTS_SIZE, rs.getLong(9));
+				info.put(JOB_TABLE_COLUMN_FAILED_COUNT, rs.getLong(10));
+				info.put(JOB_TABLE_COLUMN_FAILED_SIZE, rs.getLong(11));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_COUNT, rs.getLong(12));
+				info.put(JOB_TABLE_COLUMN_SKIP_OBJECTS_SIZE, rs.getLong(13));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_COUNT, rs.getLong(14));
+				info.put(JOB_TABLE_COLUMN_DELETE_OBJECT_SIZE, rs.getLong(15));
+				info.put(JOB_TABLE_COLUMN_START, rs.getString(16));
+				info.put(JOB_TABLE_COLUMN_END, rs.getString(17));
+				info.put(JOB_TABLE_COLUMN_ERROR_DESC, rs.getString(18));
+
+				list.add(info);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+		}
+
+        close();
+		
+		return list;
+	}
+
 	
 }

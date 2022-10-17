@@ -12,6 +12,9 @@
 package com.pspace.ifsmover.rest;
 
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.pspace.ifsmover.rest.handler.GW;
 
@@ -19,9 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
+    private static ScheduledExecutorService serviceEmptyTrash = null;
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) throws Exception {
         findIfsMover();
+        serviceEmptyTrash = Executors.newSingleThreadScheduledExecutor();
+        serviceEmptyTrash.scheduleAtFixedRate(new DeleteConfigFile(), 0, 1, TimeUnit.DAYS);
 
         logger.info("ifsmoverRest Start ...");
         GW gw = new GW();

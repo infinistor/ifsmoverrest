@@ -47,24 +47,6 @@ public class GWHandlerJetty extends AbstractHandler {
             throws IOException, ServletException {
         // TODO Auto-generated method stub
         try (InputStream is = request.getInputStream()) {
-            logger.info(baseRequest.getRootURL() + baseRequest.getOriginalURI());
-            List<NameValuePair> params = URLEncodedUtils.parse(baseRequest.getHttpURI().toURI(), Charset.forName("UTF-8"));
-
-            MultiMap<String> queryParameters = new MultiMap<String>();
-			for (NameValuePair param : params) {
-				logger.info(param.getName() + " : " + param.getValue());
-
-				String encodevalue = "";
-				if(param.getValue() != null) {
-					if(param.getName().equals("Signature"))
-						encodevalue = param.getValue().replaceAll(" ", "+");
-					else
-						encodevalue = param.getValue();
-				}
-
-				queryParameters.put(param.getName(), encodevalue);
-			}
-            baseRequest.setQueryParameters(queryParameters);
             handler.doHandle(baseRequest, request, response, is);
 			baseRequest.setHandled(true);
         } catch (RestException e) {

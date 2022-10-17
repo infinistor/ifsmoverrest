@@ -53,7 +53,7 @@ type, source, target 정보에 대한 검사 결과를 리턴합니다.
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" http://localhost:7123/api/Check -d "{\"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Check" -d "{\"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
 ```
 
 #### Start
@@ -97,7 +97,7 @@ ifsmover를 실행합니다. -check 옵션으로 먼저 수행한 후에 에러�
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" http://localhost:7123/api/Start -d "{\"UserId\":\"1234\", \"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Start" -d "{\"UserId\":\"1234\", \"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
 ```
 
 
@@ -158,7 +158,7 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해�
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" http://localhost:7123/api/Rerun/1234/1 -d "{\"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://192.168.13.13:9090\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Rerun/1234/1" -d "{\"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://192.168.13.13:9090\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
 ```
 
 
@@ -177,14 +177,18 @@ UserId와 JobId에 해당하는 작업을 삭제합니다. 진행 중인 작업�
 
 * Test
 ``` bash
-curl http://localhost:7123/api/Remove/1234/1
+curl "http://localhost:7123/api/Remove/1234/1"
 ```
 
 
 #### Status
 UserId에 해당하는 모든 Job에 대한 진행 정보를 가져옵니다.
 
-* URL : /api/Status/{UserId}
+* URL : /api/Status/{UserId} -> 해당 UserId에 대한 모든 Job Status
+* URL : /api/Status/{UserId}?JobId=1&SrcBucket=bucket1&DstBucket=bucket2
+
+* Request
+
 * Return
 
 ``` bash
@@ -223,8 +227,20 @@ UserId에 해당하는 모든 Job에 대한 진행 정보를 가져옵니다.
 ```
 
 * Test
-``` bash
-curl http://localhost:7123/api/Status/1234
+``` bash // 1234 유저에 대한 모든 Job Status
+curl "http://localhost:7123/api/Status/1234"
+```
+``` bash // 1234 유저에 대한 JobId=4인 Job Status
+curl "http://localhost:7123/api/Status/1234?JobId=4"
+```
+``` bash // 1234 유저에 대한 SrcBucket=bucket인 Job Status
+curl "http://localhost:7123/api/Status/1234?SrcBucket=bucket"
+```
+``` bash // 1234 유저에 대한 DstBucket=bucket인 Job Status
+curl "http://localhost:7123/api/Status/1234?DstBucket=bucket"
+```
+``` bash // 1234 유저에 대한 SrcBucket=bucket1, DstBucket=bucket2인 Job Status
+curl "http://localhost:7123/api/Status/1234?SrcBucket=bucket1&DstBucket=bucket2"
 ```
 
 ### 구동 환경
@@ -272,7 +288,7 @@ curl http://localhost:7123/api/Status/1234
 ```bash
 endpoint=http://0.0.0.0:7123   // ifsmoverRest Server가 사용할 http port number
 secure-endpoint=https://0.0.0.0:7333    // ifsmverRest Server가 사용할 https port number
-keystore-path=  // 인증서 위치
+keystore-path=  // 인증서 위치, ** 인증서는 .jks만 지원합니다.
 keystore-passwords= // 인증서 암호
 ifsmover_path=/usr/local/pspace/bin/ifsmover-0.2.6  // ifsmover가 설지된 디렉토리
 db_repository=mariadb   // [sqlite, mariadb] *주의 ifsmover와 설정이 같아야 합니다.
@@ -312,7 +328,7 @@ db_pool_size=5  // mariadb 시, connection pool size
 ```bash
 endpoint=http://0.0.0.0:7123   // ifsmoverRest Server가 사용할 http port number
 secure-endpoint=https://0.0.0.0:7333    // ifsmverRest Server가 사용할 https port number
-keystore-path=  // 인증서 위치
+keystore-path=  // 인증서 위치, ** 인증서는 .jks만 지원합니다.
 keystore-passwords= // 인증서 암호
 ifsmover_path=/usr/local/pspace/bin/ifsmover-0.2.6  // ifsmover가 설지된 디렉토리
 ```
