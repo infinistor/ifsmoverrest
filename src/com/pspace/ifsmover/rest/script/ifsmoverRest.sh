@@ -1,2 +1,2 @@
 #/bin/sh
-java -jar -Dconfigure=./etc/ifsmoverRest.conf -Dlogback.configurationFile=./etc/ifsmoverRestLog.xml ./lib/ifsmoverRest.jar &
+java -jar -Dconfigure=/usr/local/pspace/etc/moverrest/ifsmoverRest.conf -Dlogback.configurationFile=/usr/local/pspace/etc/moverrest/ifsmoverRestLog.xml /usr/local/pspace/bin/ifsmoverRest.jar &

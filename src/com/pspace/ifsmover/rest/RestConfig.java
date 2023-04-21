@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class RestConfig {
     private static final String SYSTEM_CONFIG_KEY = "configure";
-    private static final String CONFIG_FILE = "./etc/ifsmoverRest.conf";
+    private static final String CONFIG_FILE = "/usr/local/pspace/etc/moverrest/ifsmoverRest.conf";
     private static final String ENDPOINT = "endpoint";
     private static final String SECURE_ENDPOINT = "secure-endpoint";
     private static final String KEYSTORE_PATH = "keystore-path";

@@ -22,12 +22,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Main {
+    private final static String VERSION = "0.1.6";
+
     private static ScheduledExecutorService serviceEmptyTrash = null;
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) throws Exception {
+        if (args.length == 1) {
+            if (args[0].equals("-v")) {
+                System.out.println("ifsmoverRest version : " + VERSION);
+                System.exit(0);
+            }
+        }
+
         findIfsMover();
-        serviceEmptyTrash = Executors.newSingleThreadScheduledExecutor();
-        serviceEmptyTrash.scheduleAtFixedRate(new DeleteConfigFile(), 0, 1, TimeUnit.DAYS);
+        // serviceEmptyTrash = Executors.newSingleThreadScheduledExecutor();
+        // serviceEmptyTrash.scheduleAtFixedRate(new DeleteConfigFile(), 0, 1, TimeUnit.DAYS);
 
         logger.info("ifsmoverRest Start ...");
         GW gw = new GW();
@@ -39,6 +48,8 @@ public class Main {
             PrintStack.logging(logger, e);
         } catch (Exception e) {
             PrintStack.logging(logger, e);
+        } finally {
+            gw.stop();
         }
     }
 
@@ -48,7 +59,7 @@ public class Main {
             System.out.println();
             System.out.println("Can't find ifs_mover");
             System.out.println("ifsmover path : " + RestConfig.getInstance().getPath());
-            System.out.println("Check ./etc/ifsmoverRest.conf - ifsmover_path");
+            System.out.println("Check /usr/local/pspace/etc/moverrest/ifsmoverRest.conf - ifsmover_path");
             System.exit(-1);
         }
     }

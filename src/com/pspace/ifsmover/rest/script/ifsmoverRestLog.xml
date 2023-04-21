@@ -3,7 +3,7 @@
 <configuration scan="true" scanPeriod="30 seconds">
 
     <!--로그 파일 저장 위치-->
-    <property name="IFSMOVER_REST_LOGS_PATH" value="./log/"/>
+    <property name="IFSMOVER_REST_LOGS_PATH" value="/var/log/infinistor/moverrest"/>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
