@@ -12,6 +12,8 @@ package com.pspace.ifsmover.rest.data.format;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jnr.ffi.Struct.pid_t;
+
 public class JsonStart {
     @JsonProperty("UserId")
 	private String userId;
@@ -41,8 +43,20 @@ public class JsonStart {
         @JsonProperty("Prefix")
         private String prefix;
 
-        @JsonProperty("Move_size")
-        private String moveSize;
+        @JsonProperty("Part_size")
+        private String partSize;
+
+        @JsonProperty("Use_multipart")
+        private String useMultipart;
+
+        @JsonProperty("Metadata")
+        private String metadata;
+
+        @JsonProperty("Tag")
+        private String tag;
+
+        @JsonProperty("Acl")
+        private String acl;
 
         public String getMountPoint() {
             return mountPoint;
@@ -92,12 +106,44 @@ public class JsonStart {
             this.prefix = prefix;
         }
 
-        public String getMoveSize() {
-            return moveSize;
+        public String getPartSize() {
+            return partSize;
         }
 
-        public void setMoveSize(String moveSize) {
-            this.moveSize = moveSize;
+        public void setMoveSize(String partSize) {
+            this.partSize = partSize;
+        }
+
+        public String getUseMultipart() {
+            return useMultipart;
+        }
+
+        public void setUseMultipart(String useMultipart) {
+            this.useMultipart = useMultipart;
+        }
+
+        public String getMetadata() {
+            return metadata;
+        }
+
+        public void setMetadata(String metadata) {
+            this.metadata = metadata;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
+
+        public String getAcl() {
+            return acl;
+        }
+
+        public void setAcl(String acl) {
+            this.acl = acl;
         }
     }
 
@@ -119,6 +165,9 @@ public class JsonStart {
 
         @JsonProperty("Prefix")
         private String prefix;
+
+        @JsonProperty("Acl")
+        private String acl;
 
         public String getEndPoint() {
             return endPoint;
@@ -160,7 +209,13 @@ public class JsonStart {
             this.prefix = prefix;
         }
 
-        
+        public String getAcl() {
+            return acl;
+        }
+
+        public void setAcl(String acl) {
+            this.acl = acl;
+        }
     }
 
     public String getUserId() {
