@@ -32,9 +32,9 @@ type, source, target 정보에 대한 검사 결과를 리턴합니다.
         "Prefix":"string",
         "Part_size":"string",
         "Use_multipart":"string",
-        "Metadata":"string",
-        "Tag":"string",
-        "Acl":"string"
+        "Metadata":"string",    // [on/off]
+        "Tag":"string",         // [on/off]
+        "Acl":"string"          // [on/off]
     },
     "Target":{
         "Endpoint":"string",
@@ -42,7 +42,7 @@ type, source, target 정보에 대한 검사 결과를 리턴합니다.
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Acl":"string"
+        "Acl":"string"          // [on/off]
     }
 }
 ```
@@ -80,9 +80,9 @@ ifsmover를 실행합니다. -check 옵션으로 먼저 수행한 후에 에러�
         "Prefix":"string",
         "Part_size":"string",
         "Use_multipart":"string",
-        "Metadata":"string",
-        "Tag":"string",
-        "Acl":"string"
+        "Metadata":"string",    // [on/off]
+        "Tag":"string",         // [on/off]
+        "Acl":"string"          // [on/off]
     },
     "Target":{
         "Endpoint":"string",
@@ -90,7 +90,7 @@ ifsmover를 실행합니다. -check 옵션으로 먼저 수행한 후에 에러�
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Acl":"string"
+        "Acl":"string"          // [on/off]
     }
 }
 ```
@@ -147,9 +147,9 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해�
         "Prefix":"string",
         "Part_size":"string",
         "Use_multipart":"string",
-        "Metadata":"string",
-        "Tag":"string",
-        "Acl":"string"
+        "Metadata":"string",    // [on/off]
+        "Tag":"string",         // [on/off]
+        "Acl":"string"          // [on/off]
     },
     "Target":{
         "Endpoint":"string",
@@ -157,7 +157,7 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해�
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Acl":"string"
+        "Acl":"string"          // [on/off]
     }
 }
 ```
