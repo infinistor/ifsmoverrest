@@ -30,14 +30,19 @@ type, source, target 정보에 대한 검사 결과를 리턴합니다.
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Move_size":"string"
+        "Part_size":"string",
+        "Use_multipart":"string",
+        "Metadata":"string",
+        "Tag":"string",
+        "Acl":"string"
     },
     "Target":{
         "Endpoint":"string",
         "Access":"string",
         "Secret":"string",
         "Bucket":"string",
-        "Prefix":"string"
+        "Prefix":"string",
+        "Acl":"string"
     }
 }
 ```
@@ -53,7 +58,7 @@ type, source, target 정보에 대한 검사 결과를 리턴합니다.
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" "http://localhost:7123/api/Check" -d "{\"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Check" -d "{\"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Part_size\":null, \"Use_multipart\":null, \"Metadata\":null, \"Tag\":null, \"Acl\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\", \"Acl\":null}}"
 ```
 
 #### Start
@@ -73,14 +78,19 @@ ifsmover를 실행합니다. -check 옵션으로 먼저 수행한 후에 에러�
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Move_size":"string"
+        "Part_size":"string",
+        "Use_multipart":"string",
+        "Metadata":"string",
+        "Tag":"string",
+        "Acl":"string"
     },
     "Target":{
         "Endpoint":"string",
         "Access":"string",
         "Secret":"string",
         "Bucket":"string",
-        "Prefix":"string"
+        "Prefix":"string",
+        "Acl":"string"
     }
 }
 ```
@@ -97,7 +107,7 @@ ifsmover를 실행합니다. -check 옵션으로 먼저 수행한 후에 에러�
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" "http://localhost:7123/api/Start" -d "{\"UserId\":\"1234\", \"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Start" -d "{\"UserId\":\"1234\", \"Type\":\"s3\", \"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Part_size\":null, \"Use_multipart\":null, \"Metadata\":null, \"Tag\":null, \"Acl\":null}, \"Target\":{\"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\", \"Acl\":null}}"
 ```
 
 
@@ -135,14 +145,19 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해�
         "Secret":"string",
         "Bucket":"string",
         "Prefix":"string",
-        "Move_size":"string"
+        "Part_size":"string",
+        "Use_multipart":"string",
+        "Metadata":"string",
+        "Tag":"string",
+        "Acl":"string"
     },
     "Target":{
         "Endpoint":"string",
         "Access":"string",
         "Secret":"string",
         "Bucket":"string",
-        "Prefix":"string"
+        "Prefix":"string",
+        "Acl":"string"
     }
 }
 ```
@@ -158,7 +173,7 @@ UserId와 JobId에 해당하는 작업을 다시 수행합니다. JobId에 해�
 
 * Test
 ``` bash
-curl -H "Content-Type:application/json" "http://localhost:7123/api/Rerun/1234/1" -d "{\"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Move_size\":null}, \"Target\":{\"Endpoint\":\"http://192.168.13.13:9090\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\"}}"
+curl -H "Content-Type:application/json" "http://localhost:7123/api/Rerun/1234/1" -d "{\"Source\":{\"Mountpoint\":null, \"Endpoint\":\"http://localhost:8080\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-source\", \"Prefix\":null, \"Part_size\":null, \"Use_multipart\":null, \"Metadata\":null, \"Tag\":null, \"Acl\":null}, \"Target\":{\"Endpoint\":\"http://192.168.13.13:9090\", \"Access\":\"your_access_key\", \"Secret\":\"your_secret_key\", \"Bucket\":\"mover-test-target-01\", \"Prefix\":\"05-18-001\", \"Acl\":null}}"
 ```
 
 
