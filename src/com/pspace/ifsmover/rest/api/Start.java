@@ -167,17 +167,12 @@ public class Start extends MoverRequest {
         logger.info("Source.secret : {}", jsonStart.getSource().getSecret());
         logger.info("Source.bucket : {}", jsonStart.getSource().getBucket());
         logger.info("Source.prefix : {}", jsonStart.getSource().getPrefix());
-        logger.info("Source.part_size : {}", jsonStart.getSource().getPartSize());
-        logger.info("Srouce.use_multipart : {}", jsonStart.getSource().getUseMultipart());
-        logger.info("Source.metadata : {}", jsonStart.getSource().getMetadata());
-        logger.info("Source.tag : {}", jsonStart.getSource().getTag());
-        logger.info("Source.acl : {}", jsonStart.getSource().getAcl());
+        logger.info("Source.move_size : {}", jsonStart.getSource().getMoveSize());
         logger.info("Target.endpoint : {}", jsonStart.getTarget().getEndPoint());
         logger.info("Target.access : {}", jsonStart.getTarget().getAccess());
         logger.info("Target.secret : {}", jsonStart.getTarget().getSecret());
         logger.info("Target.bucket : {}", jsonStart.getTarget().getBucket());
         logger.info("Target.prefix : {}", jsonStart.getTarget().getPrefix());
-        logger.info("Target.acl : {}", jsonStart.getTarget().getAcl());
     }
     
     public void saveSourceConfFile(String fileName) throws IOException {
@@ -221,25 +216,10 @@ public class Start extends MoverRequest {
             } else {
                 fileWriter.write("prefix=" + jsonStart.getSource().getPrefix() + "\n");
             }
-            if (jsonStart.getSource().getPartSize() == null) {
+            if (jsonStart.getSource().getMoveSize() == null) {
                 fileWriter.write("part_size=\n");
             } else {
-                fileWriter.write("move_size=" + jsonStart.getSource().getPartSize() + "\n");
-            }
-            if (jsonStart.getSource().getMetadata() == null) {
-                fileWriter.write("metadata=\n");
-            } else {
-                fileWriter.write("metadata=" + jsonStart.getSource().getMetadata() + "\n");
-            }
-            if (jsonStart.getSource().getTag() == null) {
-                fileWriter.write("tag=\n");
-            } else {
-                fileWriter.write("tag=" + jsonStart.getSource().getTag() + "\n");
-            }
-            if (jsonStart.getSource().getAcl() == null) {
-                fileWriter.write("acl=\n");
-            } else {
-                fileWriter.write("acl=" + jsonStart.getSource().getAcl() + "\n");
+                fileWriter.write("part_size=" + jsonStart.getSource().getMoveSize() + "\n");
             }
             
             fileWriter.close();
@@ -283,11 +263,6 @@ public class Start extends MoverRequest {
                 fileWriter.write("prefix=\n");
             } else {
                 fileWriter.write("prefix=" + jsonStart.getTarget().getPrefix() + "\n");
-            }
-            if (jsonStart.getTarget().getAcl() == null) {
-                fileWriter.write("acl=\n");
-            } else {
-                fileWriter.write("acl=" + jsonStart.getTarget().getAcl() + "\n");
             }
 
             fileWriter.close();

@@ -153,8 +153,6 @@ public class JsonRerun {
         public void setPrefix(String prefix) {
             this.prefix = prefix;
         }
-
-        
     }
 
     public Source getSource() {
